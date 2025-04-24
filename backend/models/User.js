@@ -1,4 +1,4 @@
-import mongoose, { Collection } from "mongoose";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
     {
@@ -10,9 +10,8 @@ const userSchema = new mongoose.Schema(
     },
     { 
         timestamps: true,
-        Collection: "users" //define la coleccion
+        collection: "users" //define la coleccion
     },
-
 
 );
 
