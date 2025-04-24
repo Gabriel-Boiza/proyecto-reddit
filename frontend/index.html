@@ -1,13 +1,47 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reddix</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="src/styles/styles.css">
+</head>
+<body class="bg-gray-100">
+
+  <!-- Header -->
+  <header class="w-full bg-white shadow-md p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-orange-600">Reddixx</h1>
+    <div class="w-full max-w-md">
+      <input
+        type="text"
+        placeholder="Buscar..."
+        class="w-full px-4 py-2 border border-gray-300 rounded-full bg-gray-100 focus:outline-none"
+      />
+    </div>
+  </header>
+
+  <!-- Main layout -->
+  <div class="flex">
+    <!-- Aside / Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white min-h-screen p-6">
+      <h2 class="text-lg font-semibold mb-4">Menú</h2>
+      <nav class="flex flex-col gap-2">
+        <a href="#" class="hover:bg-gray-700 px-4 py-2 rounded">Inicio</a>
+        <a href="#" class="hover:bg-gray-700 px-4 py-2 rounded">Perfil</a>
+        <a href="#" class="hover:bg-gray-700 px-4 py-2 rounded">Configuración</a>
+        <a href="#" class="hover:bg-gray-700 px-4 py-2 rounded">Salir</a>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6">
+      <div class="bg-white rounded shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Bienvenido</h2>
+        <p class="text-gray-600">Este es el contenido principal de la página.</p>
+      </div>
+    </main>
+  </div>
+
+</body>
 </html>
