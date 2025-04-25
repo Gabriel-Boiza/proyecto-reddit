@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
 .header {
-    @apply w-64 text-white min-h-screen p-6 border-r border-[#3E4042];
+    @apply w-full bg-[#14181a] shadow-md px-4 py-2 flex justify-between items-center border-b border-[#3E4042];
+}
+
+.header-page-title {
+    @apply text-2xl font-bold text-white;
+}
+
+.header-search-bar {
+    @apply w-full px-2 py-2 border border-none rounded-full focus:outline-none;
+}
+
+.search-icon {
+    width: 15px;
+    height: 15px;
+    fill: white;
+}
+
+.qr-button {
+    @apply flex items-center gap-2 bg-[#2a3236] hover:bg-[#333D42] text-white font-bold px-4 py-2 mr-2 rounded-4xl w-32;
+}
+
+.login-button {
+    @apply bg-[#d93900] hover:bg-[#AE2C00] text-white font-bold px-2 py-2 mr-2 rounded-4xl;
 }

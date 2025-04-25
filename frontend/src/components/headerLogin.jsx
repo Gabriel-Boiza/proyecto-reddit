@@ -1,7 +1,6 @@
-import SearchBar from './searchbar.jsx'
 import { Link } from 'react-router-dom'
 
-function Header() {
+function HeaderLogin() {
 
    return (
      <>
@@ -16,8 +15,6 @@ function Header() {
             
             <h1 className="header-page-title">reddix</h1>
 
-            <SearchBar />
-
             <div class="flex">
               <button class="qr-button">
                 <svg fill="currentColor" height="20" width="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -26,18 +23,10 @@ function Header() {
                 Get App
               </button>
 
-              <Link to="/login" class="login-button">Log In</Link>
-              <button id="BotonDesplegableUsuario" class=" px-2 hover:bg-[#333d42] rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                  <circle cx="5" cy="12" r="2" fill="white"/>
-                  <circle cx="12" cy="12" r="2" fill="white"/>
-                  <circle cx="19" cy="12" r="2" fill="white"/>
-                </svg>
-              </button>
             </div>
         </header>
      </>
    )
  }
  
- export default Header
+ export default HeaderLogin
