@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+.aside {
+    @apply w-64 text-white min-h-screen p-6 border-r border-[#3E4042];
+}
+
+.aside-links {
+    @apply hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200;
+}
+
+.aside-nav {
+    @apply flex flex-col gap-2 border-b border-[#26282A] pb-2 mb-4;
+}
+
+.aside-title {
+    @apply text-[#637d84];
+}

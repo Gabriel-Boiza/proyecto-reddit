@@ -1,1 +1,12 @@
 @import "tailwindcss";
+@import "./aside.css";
+@import "./header.css";
+
+
+
+body {
+    background-color: #14181a;
+}
+
+  
+
