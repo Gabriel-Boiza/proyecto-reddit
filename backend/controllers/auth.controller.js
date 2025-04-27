@@ -45,7 +45,7 @@ export const login = async (req, res) => {
             {id: user.id},
             process.env.SECRET_JWT_KEY,
             {
-                expiresIn: '1h',
+                expiresIn: '3h',
             }
         )
 
