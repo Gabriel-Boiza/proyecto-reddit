@@ -1,7 +1,7 @@
 import express from "express"
 import dotenv from "dotenv"
 import cors from "cors"
-import jwt from "jsonwebtoken"
+import cookieParser from "cookie-parser"
 import connectDB from "./config/db.js"
 import usersRouter from "./routes/user.route.js"
 import postsRouter from "./routes/post.route.js"
@@ -12,7 +12,8 @@ dotenv.config()
 connectDB()
 
 const app = express()
-app.use(express.json())
+app.use(express.json()) //lee el body de las request y las transforma en un objeto json
+app.use(cookieParser()) //middleware para recibir las cookies en cada request
 
 app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:5173'],

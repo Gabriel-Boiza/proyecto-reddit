@@ -49,7 +49,11 @@ export const login = async (req, res) => {
             }
         )
 
-        res.send(jwt.decode(token))
+        res.cookie('acces_token', token, {
+            httpOnly: true, //la cookie no será accesible desde el js por parte del navegador
+        }).send({user, token})
+
+
     } catch (error) {
         res.status(401).json({message : error.message})
     }
