@@ -1,7 +1,44 @@
 import { Link } from 'react-router-dom';
+import axios from "axios";
+import { useState } from 'react';
 import HeaderLogin from '../components/headerLogin.jsx';
 
 function Register() {
+  const [user, setUser] = useState({
+    username: "",
+    name: "",
+    age: 0,
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target; //name es e.target.name y value e.target.value
+    setUser({...user,[name]: value,}); //coge el atributo name y lo pone como variable del json
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(user.password === user.confirmPassword){
+      const userObject = {
+        username: user.username,
+        name: user.name,
+        age: user.age,
+        email: user.email,
+        password: user.password,
+      }
+      axios.post("http://localhost:3000/register", userObject)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.log(error.response?.data || error.message);
+      })
+
+    }
+  };
+
   return (
     <div className="relative min-h-screen flex flex-col">
       {/* Imagen de fondo con opacidad reducida */}
@@ -20,42 +57,58 @@ function Register() {
               By continuing, you agree to our <a href="#" className="text-blue-400 underline">User Agreement</a> and acknowledge that you understand the <a href="#" className="text-blue-400 underline">Privacy Policy</a>.
             </p>
 
-            {/* Botones de login */}
-            <div className="flex flex-col gap-3 mb-4">
-              <button className="bg-white text-black rounded-full py-2 font-medium hover:bg-gray-100">
-                📱 Continue With Phone Number
-              </button>
-              <button className="bg-white text-black rounded-full py-2 font-medium hover:bg-gray-100">
-                🔍 Continue with Google
-              </button>
-              <button className="bg-white text-black rounded-full py-2 font-medium hover:bg-gray-100">
-                 Continue With Apple
-              </button>
-            </div>
-
-            {/* Línea divisoria */}
-            <div className="flex items-center my-4">
-              <hr className="flex-grow border-gray-600" />
-              <span className="text-white text-xs mx-2">OR</span>
-              <hr className="flex-grow border-gray-600" />
-            </div>
-
             {/* Formulario */}
-            <form className="flex flex-col gap-3">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <input
                 type="text"
-                placeholder="Email or username"
+                name="username"
+                value={user.username}
+                onChange={handleChange}
+                placeholder="Username"
+                className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <input
+                type="text"
+                name="name"
+                value={user.name}
+                onChange={handleChange}
+                placeholder="Full Name"
+                className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <input
+                type="number"
+                name="age"
+                value={user.age}
+                onChange={handleChange}
+                placeholder="Age"
+                className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                value={user.email}
+                onChange={handleChange}
+                placeholder="Email"
                 className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
               <input
                 type="password"
+                name="password"
+                value={user.password}
+                onChange={handleChange}
                 placeholder="Password"
                 className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
               <input
                 type="password"
+                name="confirmPassword"
+                value={user.confirmPassword}
+                onChange={handleChange}
                 placeholder="Repeat your password"
                 className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required

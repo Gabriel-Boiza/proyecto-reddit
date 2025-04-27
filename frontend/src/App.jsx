@@ -5,7 +5,7 @@ import Register from './pages/register.jsx'
 
 import Header from './components/header.jsx'
 import Aside from './components/aside.jsx'
-
+ 
 function App() {
   return (
     <Router>

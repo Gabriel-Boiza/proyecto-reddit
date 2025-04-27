@@ -1,7 +1,38 @@
 import { Link } from 'react-router-dom';
+import axios from "axios";
 import HeaderLogin from '../components/headerLogin.jsx';
+import {useState} from "react";
+
 
 function Login() {
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    console.log(user);
+
+    axios.post("http://localhost:3000/login", user)
+    .then(response => {
+      console.log(response.data);
+    })
+    .catch(error => {
+      console.log(error.response?.data || error.message);
+    })
+  }
+
+  const [user, setUser] = useState({
+    email: "",
+    password: ""
+  })
+
+  const handleUsernameInput = (e) => {
+    setUser({...user, email: e.target.value})
+  }
+
+  
+  const handlepasswordInput = (e) => {
+    setUser({...user, password: e.target.value})
+  }
+
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden">
 
@@ -20,39 +51,21 @@ function Login() {
               By continuing, you agree to our <a href="#" className="text-blue-400 underline">User Agreement</a> and acknowledge that you understand the <a href="#" className="text-blue-400 underline">Privacy Policy</a>.
             </p>
 
-            {/* Botones de login */}
-            <div className="flex flex-col gap-3 mb-4">
-              <button className="bg-white text-black rounded-full py-2 font-medium hover:bg-gray-100">
-                📱 Continue With Phone Number
-              </button>
-              <button className="bg-white text-black rounded-full py-2 font-medium hover:bg-gray-100">
-                🔍 Continue with Google
-              </button>
-              <button className="bg-white text-black rounded-full py-2 font-medium hover:bg-gray-100">
-                 Continue With Apple
-              </button>
-            </div>
-
-            {/* Línea divisoria */}
-            <div className="flex items-center my-4">
-              <hr className="flex-grow border-gray-600" />
-              <span className="text-white text-xs mx-2">OR</span>
-              <hr className="flex-grow border-gray-600" />
-            </div>
-
             {/* Formulario */}
-            <form className="flex flex-col gap-3">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <input
                 type="text"
                 placeholder="Email or username"
                 className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                onChange={handleUsernameInput}
               />
               <input
                 type="password"
                 placeholder="Password"
                 className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                onChange={handlepasswordInput}
               />
 
               <a href="#" className="text-blue-400 text-sm hover:underline mt-1">Forgot password?</a>

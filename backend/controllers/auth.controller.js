@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 
 
 export const register = async (req, res) => {
-    const {username, name, age, email, password, posts, comments} = req.body
+    const {username, name, age, email, password} = req.body
 
     try {
         
@@ -19,8 +19,8 @@ export const register = async (req, res) => {
             age : age,
             email : email,
             password : hashPassword,
-            posts : posts,
-            comments : comments
+            posts : [],
+            comments : []
         })
     
         await user.save()
@@ -51,9 +51,9 @@ export const login = async (req, res) => {
 
         res.cookie('acces_token', token, {
             httpOnly: true, //la cookie no será accesible desde el js por parte del navegador
-        }).send({user, token})
+        }).send(token)
 
-
+        
     } catch (error) {
         res.status(401).json({message : error.message})
     }
