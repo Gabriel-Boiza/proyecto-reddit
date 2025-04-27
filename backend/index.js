@@ -1,9 +1,11 @@
 import express from "express"
 import dotenv from "dotenv"
 import cors from "cors"
+import jwt from "jsonwebtoken"
 import connectDB from "./config/db.js"
 import usersRouter from "./routes/user.route.js"
 import postsRouter from "./routes/post.route.js"
+import authRouter from "./routes/auth.routes.js"
 
 
 dotenv.config()
@@ -22,6 +24,7 @@ app.get('/', (req, res) => {
 
 app.use("/", usersRouter)
 app.use("/", postsRouter)
+app.use("/", authRouter)
 
 
 

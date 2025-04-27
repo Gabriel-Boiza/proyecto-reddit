@@ -5,4 +5,9 @@ const route = express.Router()
 
 route.get("/getAllPosts", PostController.getAllPosts)
 
+
+
+route.post("/createPost", PostController.createPost)
+
+
 export default route

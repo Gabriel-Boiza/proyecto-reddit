@@ -10,13 +10,15 @@ export const getAllUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
     const params = req.params //obtenemos los parametros del get
     const id = params.id
-    const user = await User.findById(id)
-    res.json(user)
+    try {
+        const user = await User.findById(id)
+        if(!user){throw new Error("User not found")}
+        res.json(user)
+    } catch (error) {
+        res.status(404).json({message: error.message})
+    }
 }
 
-export const createUser = async (req, res) => {
-    res.send(req.body)
-}
 
 export const editUser = async (req, res) => {
     res.send(req.body)
@@ -25,23 +27,38 @@ export const editUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
     const params = req.params 
     const id = params.id
-    const user = await User.findById(id)
-
-    await user.deleteOne()
+    try {
+        const user = await User.findById(id)
+        if(!user){throw new Error("User not found")}
+        await user.deleteOne()
+        res.json({message: "OK"})
+    } catch (error) {
+        res.status(404).json({message: error.message})
+    }
+    
 }
 
 export const getUserPosts = async (req, res) => {
     const params = req.params 
     const id = params.id
-    const user = await User.findById(id).populate('posts')
-
-    res.json(user.posts)
+    try {
+        const user = await User.findById(id).populate('posts');
+        if (!user) {throw new Error("User not found")}
+        res.json(user.posts)
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
 }
 
-export const getUserComments = async (req, res) => {
-    const params = req.params
-    const id = params.id
-    const user = await User.findById(id).populate('comments')
 
-    res.json(user.comments)
+export const getUserComments = async (req, res) => {
+    const params = req.params 
+    const id = params.id
+    try {
+        const user = await User.findById(id).populate('comments');
+        if (!user) {throw new Error("User not found")}
+        res.json(user.comments);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
 }
