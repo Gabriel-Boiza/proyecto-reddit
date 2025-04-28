@@ -14,7 +14,7 @@ function Header() {
             </svg>
             </button>
             
-            <h1 className="header-page-title">reddix</h1>
+            <Link to="/" className="header-page-title">reddix</Link>
 
             <SearchBar />
 

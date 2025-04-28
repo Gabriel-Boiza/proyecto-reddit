@@ -13,7 +13,7 @@ function HeaderLogin() {
             </svg>
             </button>
             
-            <h1 className="header-page-title">reddix</h1>
+            <Link to="/" className="header-page-title">reddix</Link>
 
             <div className="flex">
               <button className="qr-button">
