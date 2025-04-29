@@ -1,41 +1,43 @@
 import { Link } from 'react-router-dom';
 import axios from "axios";
-import HeaderLogin from '../components/headerLogin.jsx';
-import {useState} from "react";
-
+import HeaderLogin from '../layouts/headerLogin.jsx';
+import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState({ email: "", password: "" });
+  const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log(user);
+    e.preventDefault();
 
-    axios.post("http://localhost:3000/login", user)
+    axios.post("http://localhost:3000/login", user, {
+      withCredentials: true
+    })
     .then(response => {
-      console.log(response.data);
+      setMessage("Login succesful");
+      setIsError(false);
+      setTimeout(() => navigate("/"), 500);
     })
     .catch(error => {
-      console.log(error.response?.data || error.message);
-    })
-  }
-
-  const [user, setUser] = useState({
-    email: "",
-    password: ""
-  })
+      const msg = error.response?.data?.message || "Error.";
+      setMessage(msg);
+      setIsError(true);
+    });
+  };
 
   const handleUsernameInput = (e) => {
-    setUser({...user, email: e.target.value})
-  }
+    setUser({ ...user, email: e.target.value });
+  };
 
-  
-  const handlepasswordInput = (e) => {
-    setUser({...user, password: e.target.value})
-  }
+  const handlePasswordInput = (e) => {
+    setUser({ ...user, password: e.target.value });
+  };
 
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden">
-
       {/* Capa con fondo SVG */}
       <div className="absolute inset-0 bg-[url('../assets/svg/login-background.svg')] bg-cover bg-center opacity-20 z-0" />
 
@@ -65,7 +67,7 @@ function Login() {
                 placeholder="Password"
                 className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
-                onChange={handlepasswordInput}
+                onChange={handlePasswordInput}
               />
 
               <a href="#" className="text-blue-400 text-sm hover:underline mt-1">Forgot password?</a>
@@ -77,6 +79,13 @@ function Login() {
                 Log In
               </button>
             </form>
+
+            {/* Mensaje */}
+            {message && (
+              <p className={`text-sm text-center mt-4 ${isError ? 'text-red-400' : 'text-green-400'}`}>
+                {message}
+              </p>
+            )}
 
             <p className="text-white text-sm text-center mt-4">
               New to Reddix? <Link to="/register" className="text-blue-400 hover:underline">Sign Up</Link>

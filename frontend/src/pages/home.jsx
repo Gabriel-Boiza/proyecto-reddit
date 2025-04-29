@@ -1,5 +1,14 @@
+import Header from "../layouts/header"
+import Aside from "../layouts/aside"
 function Home() {
-    return <h1>Bienvenido a la página principal</h1>
-  }
+  
+    return (
+      <>
+        <Header/>
+        <Aside/>
+      </>
+    )
+
+}
   
   export default Home  

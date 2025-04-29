@@ -49,9 +49,8 @@ export const login = async (req, res) => {
             }
         )
 
-        res.cookie('acces_token', token, {
-            httpOnly: true, //la cookie no será accesible desde el js por parte del navegador
-        }).send(token)
+        res.cookie('acces_token', token).send("cookie metida")
+
 
         
     } catch (error) {
