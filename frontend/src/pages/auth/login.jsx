@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import axios from "axios";
-import HeaderLogin from '../layouts/headerLogin.jsx';
+import HeaderLogin from '../../layouts/headerLogin.jsx';
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 
