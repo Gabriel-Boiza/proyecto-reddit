@@ -2,6 +2,8 @@ import User from "../models/User.js"
 import Comment from "../models/Comment.js";
 import Post from "../models/Post.js";
 
+import jwt from "jsonwebtoken"
+
 export const getAllUsers = async (req, res) => {
     const users = await User.find();
     res.json(users)
@@ -17,6 +19,11 @@ export const getUserById = async (req, res) => {
     } catch (error) {
         res.status(404).json({message: error.message})
     }
+}
+
+export const getUserByCookie = async (req, res) => {
+    const token = req.cookies.acces_token
+    res.json({user: jwt.verify(token, process.env.SECRET_JWT_KEY)})
 }
 
 

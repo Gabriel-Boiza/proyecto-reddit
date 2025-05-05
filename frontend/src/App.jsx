@@ -1,30 +1,26 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Home from './pages/home.jsx'
-import Login from './pages/login.jsx'
-import Register from './pages/register.jsx'
 
-import Header from './components/header.jsx'
-import Aside from './components/aside.jsx'
+
+import Home from './pages/home.jsx'
+
+import Login from './pages/auth/login.jsx'
+import Register from './pages/auth/register.jsx'
+
+import Profile from './pages/profile/profile.jsx'
+
+import PrivateRoute from './components/privateRoute.jsx'
  
 function App() {
+  
   return (
     <Router>
       <Routes>
-        {/* Ruta principal con header y aside directamente */}
-        <Route
-          path="/"
-          element={
-            <>
-              <Header />
-              <Aside />
-              <Home />
-            </>
-          }
-        />
-
-        {/* Ruta con layout diferente (sin header/aside) */}
+        <Route path="/" element={<Home/>}></Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route element={<PrivateRoute/>}>
+          <Route path='/profile' element={<Profile />}/>
+        </Route>
       </Routes>
     </Router>
   )

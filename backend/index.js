@@ -13,8 +13,10 @@ connectDB()
 
 const app = express()
 app.use(express.json()) //lee el body de las request y las transforma en un objeto json
-app.use(cors());
-
+app.use(cors({
+    origin: 'http://localhost:5173', 
+    credentials: true
+}))
 app.use(cookieParser()) //middleware para recibir las cookies en cada request
 
   
@@ -31,5 +33,5 @@ app.use("/", authRouter)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
-    console.log("Servidor")
+    console.log("Servidor " + PORT)
 })

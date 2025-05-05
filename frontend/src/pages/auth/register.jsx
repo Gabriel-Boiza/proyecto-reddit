@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import { useState } from 'react';
-import HeaderLogin from '../components/headerLogin.jsx';
+import HeaderLogin from '../../layouts/headerLogin.jsx';
 
 function Register() {
   const [user, setUser] = useState({
