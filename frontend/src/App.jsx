@@ -5,6 +5,8 @@ import Home from './pages/home.jsx'
 
 import Login from './pages/auth/login.jsx'
 import Register from './pages/auth/register.jsx'
+import CreatePost from './pages/posts/createPost.jsx'
+
 
 import Profile from './pages/profile/profile.jsx'
 
@@ -18,9 +20,12 @@ function App() {
         <Route path="/" element={<Home/>}></Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/createPost" element={<CreatePost />} />
+
         <Route element={<PrivateRoute/>}>
           <Route path='/profile' element={<Profile />}/>
         </Route>
+
       </Routes>
     </Router>
   )

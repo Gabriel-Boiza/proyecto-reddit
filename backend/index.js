@@ -13,10 +13,7 @@ connectDB()
 
 const app = express()
 app.use(express.json()) //lee el body de las request y las transforma en un objeto json
-app.use(cors({
-    origin: 'http://localhost:5173', 
-    credentials: true
-}))
+app.use(cors())
 app.use(cookieParser()) //middleware para recibir las cookies en cada request
 
   
