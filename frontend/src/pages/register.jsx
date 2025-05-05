@@ -7,7 +7,6 @@ function Register() {
   const [user, setUser] = useState({
     username: "",
     name: "",
-    age: 0,
     email: "",
     password: "",
     confirmPassword: "",
@@ -24,7 +23,6 @@ function Register() {
       const userObject = {
         username: user.username,
         name: user.name,
-        age: user.age,
         email: user.email,
         password: user.password,
       }
@@ -74,15 +72,6 @@ function Register() {
                 value={user.name}
                 onChange={handleChange}
                 placeholder="Full Name"
-                className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-              <input
-                type="number"
-                name="age"
-                value={user.age}
-                onChange={handleChange}
-                placeholder="Age"
                 className="bg-gray-700 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
