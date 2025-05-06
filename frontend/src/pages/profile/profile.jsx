@@ -73,8 +73,31 @@ function Profile() {
                         </div>
                     </section>
                     
-                    <article className="rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)] max-h-[70%]">
-                        
+                    <article className="p-10 rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)] max-h-[70%]">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-white font-bold">{user.username}</h2>
+
+                        </div>
+
+                        <div className="mb-4">
+                            <h3 className="text-xs font-bold text-gray-400 mb-2">SETTINGS</h3>
+                            
+                            <div className="flex justify-between items-center mb-3">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-cyan-500 rounded-full w-6 h-6 flex items-center justify-center">
+                                <div className="w-3 h-3 rounded-full bg-white mb-1"></div>
+                                <div className="w-4 h-2 rounded-t-full bg-white absolute mt-3"></div>
+                                </div>
+                                <div>
+                                <p className="text-white text-sm">Profile</p>
+                                <p className="text-xs">Customize your profile</p>
+                                </div>
+                            </div>
+                            <button className="bg-gray-700 text-white text-xs rounded-full px-3 py-1">Update</button>
+                            </div>
+                            
+                        </div>
+
                     </article>
                 </main>
             </div>

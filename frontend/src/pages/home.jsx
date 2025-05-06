@@ -1,18 +1,36 @@
 import Header from "../layouts/header";
 import Aside from "../layouts/aside";
-import Post from "../components/posts/post"; // ✅ Importa tu componente nuevo
-
-// Todo lo demás igual hasta el return...
+import Post from "../components/posts/post";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 function Home() {
-  // const orderedPosts = groupPostsByWeek(posts); // 🔁 Puedes comentar esto de momento si no vas a usarlo
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    postsData();
+  }, []);
+
+
+  const postsData = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/getAllPosts", {
+        withCredentials: true,
+      });
+      setPosts(response.data);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
   return (
     <>
       <Header />
       <Aside />
       <div className="p-6 max-w-4xl mx-auto space-y-6">
-        <Post /> {/* ✅ Solo renderizas el componente con datos hardcodeados */}
+        {posts.map((post) => (
+          <Post key={post._id} post={post} />
+        ))}
       </div>
     </>
   );
