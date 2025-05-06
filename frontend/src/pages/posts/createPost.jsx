@@ -1,20 +1,48 @@
 import Header from "../../layouts/header";
 import Aside from "../../layouts/aside";
 import React, { useState, useRef, useEffect } from 'react';
+import axios from "axios"
 
 function CreatePost() {
   const [activeTab, setActiveTab] = useState('text');
   const [imagePreview, setImagePreview] = useState(null);
   const [activeFormats, setActiveFormats] = useState([]);
   const [editorContent, setEditorContent] = useState('');
-  const [linkValue, setLinkValue] = useState('');
+  const [title, setTitle] = useState('');
+  const [imageFile, setImageFile] = useState(null);
   const editorRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const cleanContent = cleanHTML(editorContent);
+
+    const postData = {
+      title,
+      description: activeTab === 'text' ? cleanContent : '',
+      type: activeTab,
+      file_url: imageFile
+    };
+
+    axios.post("http://localhost:3000/createPost", postData, {
+      withCredentials: true
+    })
+    .then(response => {
+      console.log(response.data);
+      
+    })
+    .catch(error => {
+      console.log("no");
+
+    });
+    
+  };
 
   const execFormat = (command, value = null) => {
     document.execCommand(command, false, value);
     editorRef.current.focus();
     updateActiveFormats();
-    setEditorContent(editorRef.current.innerHTML); // actualiza al aplicar formato
+    setEditorContent(editorRef.current.innerHTML);
   };
 
   const insertTable = () => {
@@ -43,9 +71,14 @@ function CreatePost() {
       return;
     }
 
+    setImageFile(file);
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result);
     reader.readAsDataURL(file);
+  };
+
+  const cleanHTML = (html) => {
+    return html.replace(/dir=["']?rtl["']?/gi, '');
   };
 
   useEffect(() => {
@@ -54,7 +87,6 @@ function CreatePost() {
   }, []);
 
   useEffect(() => {
-    // Cada vez que se cambia de pestaña, se restaura el contenido del editor
     if (activeTab === 'text' && editorRef.current) {
       editorRef.current.innerHTML = editorContent;
     }
@@ -73,7 +105,7 @@ function CreatePost() {
 
             {/* Tabs */}
             <div className="flex border-b mb-4">
-              {['text', 'image', 'link'].map(tab => (
+              {['text', 'image'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -81,7 +113,7 @@ function CreatePost() {
                     activeTab === tab ? 'text-blue-600' : 'text-gray-700'
                   }`}
                 >
-                  {tab === 'text' ? 'Text' : tab === 'image' ? 'Images & Video' : 'Link'}
+                  {tab === 'text' ? 'Text' : 'Images & Video'}
                   {activeTab === tab && (
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-600 rounded-t"></div>
                   )}
@@ -89,47 +121,30 @@ function CreatePost() {
               ))}
             </div>
 
-            {/* Form */}
-            <div>
+            {/* Formulario */}
+            <form onSubmit={handleSubmit}>
               <input
                 type="text"
                 placeholder="Title*"
                 className="w-full mb-4 p-2 border border-gray-300 rounded"
                 maxLength={300}
+                name="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
               />
 
               {activeTab === 'text' && (
                 <>
                   {/* Toolbar */}
                   <div className="mb-2 flex flex-wrap gap-2">
-                    <button
-                      onClick={() => execFormat('bold')}
-                      className={`px-2 py-1 border rounded ${isActive('bold') ? 'bg-blue-200' : ''}`}
-                    >B</button>
-                    <button
-                      onClick={() => execFormat('italic')}
-                      className={`px-2 py-1 border rounded italic ${isActive('italic') ? 'bg-blue-200' : ''}`}
-                    >I</button>
-                    <button
-                      onClick={() => execFormat('underline')}
-                      className={`px-2 py-1 border rounded underline ${isActive('underline') ? 'bg-blue-200' : ''}`}
-                    >U</button>
-                    <button
-                      onClick={() => execFormat('strikeThrough')}
-                      className={`px-2 py-1 border rounded line-through ${isActive('strikeThrough') ? 'bg-blue-200' : ''}`}
-                    >S</button>
-                    <button
-                      onClick={() => execFormat('superscript')}
-                      className={`px-2 py-1 border rounded ${isActive('superscript') ? 'bg-blue-200' : ''}`}
-                    >x²</button>
-                    <button
-                      onClick={() => execFormat('subscript')}
-                      className={`px-2 py-1 border rounded ${isActive('subscript') ? 'bg-blue-200' : ''}`}
-                    >xₙ</button>
-                    <button
-                      onClick={insertTable}
-                      className="px-2 py-1 border rounded"
-                    >Tabla</button>
+                    <button type="button" onClick={() => execFormat('bold')} className={`px-2 py-1 border rounded ${isActive('bold') ? 'bg-blue-200' : ''}`}>B</button>
+                    <button type="button" onClick={() => execFormat('italic')} className={`px-2 py-1 border rounded italic ${isActive('italic') ? 'bg-blue-200' : ''}`}>I</button>
+                    <button type="button" onClick={() => execFormat('underline')} className={`px-2 py-1 border rounded underline ${isActive('underline') ? 'bg-blue-200' : ''}`}>U</button>
+                    <button type="button" onClick={() => execFormat('strikeThrough')} className={`px-2 py-1 border rounded line-through ${isActive('strikeThrough') ? 'bg-blue-200' : ''}`}>S</button>
+                    <button type="button" onClick={() => execFormat('superscript')} className={`px-2 py-1 border rounded ${isActive('superscript') ? 'bg-blue-200' : ''}`}>x²</button>
+                    <button type="button" onClick={() => execFormat('subscript')} className={`px-2 py-1 border rounded ${isActive('subscript') ? 'bg-blue-200' : ''}`}>xₙ</button>
+                    <button type="button" onClick={insertTable} className="px-2 py-1 border rounded">Tabla</button>
                   </div>
 
                   {/* Editor */}
@@ -138,10 +153,8 @@ function CreatePost() {
                     contentEditable
                     onInput={(e) => setEditorContent(e.currentTarget.innerHTML)}
                     className="w-full h-40 p-2 border border-gray-300 rounded overflow-y-auto text-left"
-                    style={{ direction: 'ltr' }}
                     suppressContentEditableWarning={true}
                   ></div>
-
                 </>
               )}
 
@@ -166,26 +179,15 @@ function CreatePost() {
                 </>
               )}
 
-              {activeTab === 'link' && (
-                <input
-                  type="text"
-                  placeholder="Link URL*"
-                  value={linkValue}
-                  onChange={(e) => setLinkValue(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-              )}
-
               <div className="flex justify-end mt-4">
-                <button className="bg-gray-200 px-4 py-2 mr-2 rounded text-gray-500 cursor-not-allowed" disabled>
-                  Save Draft
-                </button>
-                <button className="bg-gray-200 px-4 py-2 rounded text-gray-500 cursor-not-allowed" disabled>
+                <button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                >
                   Post
                 </button>
               </div>
-            </div>
-
+            </form>
           </div>
         </div>
       </div>

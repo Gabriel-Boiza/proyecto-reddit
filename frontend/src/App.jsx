@@ -17,15 +17,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home/>}></Route>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/createPost" element={<CreatePost />} />
 
-        <Route element={<PrivateRoute/>}>
-          <Route path='/profile' element={<Profile />}/>
+        <Route element={<PrivateRoute />}>
+          <Route path="/createPost" element={<CreatePost />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
-
       </Routes>
     </Router>
   )
