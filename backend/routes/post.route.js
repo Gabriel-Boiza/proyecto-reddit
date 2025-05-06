@@ -6,7 +6,7 @@ import * as authMiddleware from '../middlewares/auth.middleware.js'
 const route = express.Router()
 
 route.get("/getAllPosts", PostController.getAllPosts)
-
+route.get("/getPostsByCookie", authMiddleware.verifyToken, PostController.getPostsByCookie)
 
 
 route.post("/createPost", authMiddleware.verifyToken , PostController.createPost)
