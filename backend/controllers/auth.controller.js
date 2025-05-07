@@ -50,11 +50,18 @@ export const login = async (req, res) => {
             }
         )
 
-        res.cookie('acces_token', token).send("cookie metida")
-
+        res.cookie('acces_token', token, {httpOnly: true, secure: false}).send("cookie metida")
 
         
     } catch (error) {
         res.status(401).json({message : error.message})
+    }
+}
+
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie('acces_token', {httpOnly: true, secure: false}).json({message : "cookie deleted"})
+    } catch (error) {
+        res.status(500).json({message : error.message})
     }
 }

@@ -12,7 +12,7 @@ export const getAllPosts = async (req, res) => {
       console.error("Error al obtener los posts:", error);
       res.status(500).json({ message: "Error interno al obtener los posts." });
     }
-  };
+};
   
 
 export const createPost = async (req, res) => {
