@@ -13,18 +13,25 @@ import Profile from './pages/profile/profile.jsx'
 import PrivateRoute from './components/privateRoute.jsx'
  
 function App() {
-  
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home/>}></Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/createPost" element={<CreatePost />} />
 
-        <Route element={<PrivateRoute />}>
+        <Route element={<PrivateRoute/>}>
+          <Route path='/profile' element={<Profile />}/>
           <Route path="/createPost" element={<CreatePost />} />
-          <Route path="/profile" element={<Profile />} />
+
         </Route>
+        <Route element={<PrivateRoute/>}>
+          <Route path='/profile' element={<Profile />}/>
+          <Route path="/createPost" element={<CreatePost />} />
+
+        </Route>
+
       </Routes>
     </Router>
   )

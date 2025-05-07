@@ -13,6 +13,23 @@ export const getAllPosts = async (req, res) => {
       res.status(500).json({ message: "Error interno al obtener los posts." });
     }
 };
+
+export const getPostById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const post = await Post.findById(id).populate("user_id", "username name");
+
+        if (!post) {
+            return res.status(404).json({ message: "Post no encontrado." });
+        }
+
+        res.status(200).json(post);
+    } catch (error) {
+        console.error("Error al obtener el post:", error);
+        res.status(500).json({ message: "Error interno al obtener el post." });
+    }
+};
   
 
 export const createPost = async (req, res) => {

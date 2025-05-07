@@ -1,10 +1,29 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
-const authContext = () => {
+const AuthContext = createContext()
+
+export const useAuth = () => {
+    const context = useContext(AuthContext)
+    return context
+}
+
+const AuthProvider = () => {
     const [auth, setAuth] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isAuth, setIsAuth] = useState(false);
+
+    const login = async () => {
+        try {
+            const data = await axios.post("http://localhost:3000/login", user, {withCredentials: true})
+            setIsAuth(true);
+        } catch (error) {
+            setIsAuth(false);
+        }
+        
+
+    }
 
     useEffect(() => {
         axios.get("http://localhost:3000/check-auth", { withCredentials: true })
@@ -18,4 +37,4 @@ const authContext = () => {
     return auth ? <Outlet /> : <Navigate to="/login" />;  
 };
 
-export default PrivateRoute;
+export default AuthContext;
