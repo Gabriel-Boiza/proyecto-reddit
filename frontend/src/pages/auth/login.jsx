@@ -1,31 +1,23 @@
-import { Link } from 'react-router-dom';
-import axios from "axios";
-import HeaderLogin from '../../layouts/headerLogin.jsx';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import HeaderLogin from '../../layouts/headerLogin.jsx';
+
+import { useAuth } from '../../context/authContext.js';
 
 function Login() {
   const navigate = useNavigate();
-  const [user, setUser] = useState({ email: "", password: "" });
-  const [message, setMessage] = useState("");
-  const [isError, setIsError] = useState(false);
+  const { login, message, isError} = useAuth();
 
-  const handleSubmit = (e) => {
+  const [user, setUser] = useState({ email: "", password: "" });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    axios.post("http://localhost:3000/login", user, {
-      withCredentials: true
-    })
-    .then(response => {
-      setMessage("Login succesful");
-      setIsError(false);
+    const success = await login(user);
+    if (success) {
       setTimeout(() => navigate("/"), 500);
-    })
-    .catch(error => {
-      const msg = error.response?.data?.message || "Error.";
-      setMessage(msg);
-      setIsError(true);
-    });
+    }
+
   };
 
   const handleUsernameInput = (e) => {
@@ -38,22 +30,17 @@ function Login() {
 
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* Capa con fondo SVG */}
       <div className="absolute inset-0 bg-[url('../assets/svg/login-background.svg')] bg-cover bg-center opacity-20 z-0" />
-
-      {/* Contenido */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <HeaderLogin />
-
         <div className="flex flex-1 justify-center items-center px-4">
           <div className="bg-neutral-800 bg-opacity-90 rounded-lg p-8 w-full max-w-md shadow-lg">
             <h1 className="text-center text-white text-2xl font-extrabold mb-4">Log In</h1>
-            
+
             <p className="text-white text-sm text-center mb-6">
               By continuing, you agree to our <a href="#" className="text-blue-400 underline">User Agreement</a> and acknowledge that you understand the <a href="#" className="text-blue-400 underline">Privacy Policy</a>.
             </p>
 
-            {/* Formulario */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <input
                 type="text"
@@ -72,15 +59,11 @@ function Login() {
 
               <a href="#" className="text-blue-400 text-sm hover:underline mt-1">Forgot password?</a>
 
-              <button
-                type="submit"
-                className="bg-gray-600 text-white rounded-full py-2 mt-3 hover:bg-gray-500"
-              >
+              <button type="submit" className="bg-gray-600 text-white rounded-full py-2 mt-3 hover:bg-gray-500">
                 Log In
               </button>
             </form>
 
-            {/* Mensaje */}
             {message && (
               <p className={`text-sm text-center mt-4 ${isError ? 'text-red-400' : 'text-green-400'}`}>
                 {message}

@@ -1,9 +1,9 @@
 import SearchBar from './searchbar.jsx'
 import { Link } from 'react-router-dom'
 import { Plus } from "lucide-react";
-
+import { useAuth } from '../context/authContext.js';
 function Header() {
-
+    const {isAuth} = useAuth()
    return (
      <>
        <header className="header">
@@ -22,9 +22,12 @@ function Header() {
 
 
             <div class="flex">
-              <Link to="/createPost" class="qr-button">
+              
+              {isAuth && (
+                <Link to="/createPost" class="qr-button">
                 <Plus className="w-6 h-6" /> Create
-              </Link> 
+                </Link> 
+              )}
 
               <button class="qr-button">
                 <svg fill="currentColor" height="20" width="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">

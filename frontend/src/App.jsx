@@ -1,40 +1,32 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+import Home from './pages/home.jsx';
+import Login from './pages/auth/login.jsx';
+import Register from './pages/auth/register.jsx';
+import CreatePost from './pages/posts/createPost.jsx';
+import Profile from './pages/profile/profile.jsx';
 
-import Home from './pages/home.jsx'
+import AuthProvider from './context/authProvider.jsx';
+import PrivateRoute from './components/privateRoute.jsx';
 
-import Login from './pages/auth/login.jsx'
-import Register from './pages/auth/register.jsx'
-import CreatePost from './pages/posts/createPost.jsx'
-
-
-import Profile from './pages/profile/profile.jsx'
-
-import PrivateRoute from './components/privateRoute.jsx'
- 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home/>}></Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/createPost" element={<CreatePost />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        <Route element={<PrivateRoute/>}>
-          <Route path='/profile' element={<Profile />}/>
-          <Route path="/createPost" element={<CreatePost />} />
-
-        </Route>
-        <Route element={<PrivateRoute/>}>
-          <Route path='/profile' element={<Profile />}/>
-          <Route path="/createPost" element={<CreatePost />} />
-
-        </Route>
-
-      </Routes>
-    </Router>
-  )
+          {/* Rutas privadas */}
+          <Route element={<PrivateRoute />}>
+            <Route path="/createPost" element={<CreatePost />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
