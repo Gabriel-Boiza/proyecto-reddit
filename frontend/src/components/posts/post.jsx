@@ -92,7 +92,7 @@ function Post({ post }) {
           <h2 className="text-lg font-semibold">{post.title}</h2>
           <p className="text-sm text-gray-400 mb-3">{post.description}</p>
           <img
-            src={post?.file_url ? `http://localhost:3000/uploads/${post.file_url}` : '/default.png'}
+            src={post?.file_url ? `${domain}uploads/${post.file_url}` : '/default.png'}
             alt="post"
             className="rounded-lg border border-muted shadow mb-3 w-full object-cover"
           />
