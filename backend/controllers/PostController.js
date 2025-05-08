@@ -47,7 +47,6 @@ export const createPost = async (req, res) => {
             },  
             file_url: "file_url",
             comments: [],
-            community_id: "6809fa19371970ec6cf6dcf5"
         });
 
         await post.save();
