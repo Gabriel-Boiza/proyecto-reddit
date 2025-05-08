@@ -18,7 +18,6 @@ function Home() {
         withCredentials: true,
       });
       setPosts(response.data);
-      console.log("Me gustan las menores");
     } catch (error) {
       console.error("Error fetching posts:", error);
     }

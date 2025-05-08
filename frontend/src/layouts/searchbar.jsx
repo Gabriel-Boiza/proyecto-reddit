@@ -5,7 +5,7 @@ function SearchBar() {
       <>
         <div className="w-full max-w-md flex items-center space-x-2 bg-[#2a3236] hover:bg-[#333D42] rounded-full">
               <svg
-                class="search-icon w-5 h-5 text-white ml-5"
+                className="search-icon w-5 h-5 text-white ml-5"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 width="15"
