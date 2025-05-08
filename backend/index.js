@@ -18,6 +18,7 @@ app.use(cors({
     credentials: true
   }));
 app.use(cookieParser()) //middleware para recibir las cookies en cada request
+app.use('/uploads', express.static('uploads'));
 
   
 

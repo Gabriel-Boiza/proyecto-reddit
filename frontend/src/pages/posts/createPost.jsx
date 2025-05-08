@@ -11,42 +11,50 @@ function CreatePost() {
   const [imageFile, setImageFile] = useState(null);
   const descriptionRef = useRef(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const postData = {
-      title: title,
-      description: description,
-      file_url: imageFile,
-    };
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('description', description);
+  if (imageFile) {
+    formData.append('file', imageFile);
+  }
 
-    try {
-      await axios.post('http://localhost:3000/createPost', postData, { withCredentials: true });
-      setTitle('');
-      setDescription('');
-      setImageFile(null);
-      setImagePreview(null);
-      if (descriptionRef.current) descriptionRef.current.innerHTML = '';
-    } catch (error) {
-      console.error('Error creating post:', error);
-    }
-  };
+  try {
+    await axios.post('http://localhost:3000/createPost', formData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    setTitle('');
+    setDescription('');
+    setImageFile(null);
+    setImagePreview(null);
+    if (descriptionRef.current) descriptionRef.current.innerHTML = '';
+  } catch (error) {
+    console.error('Error creating post:', error);
+  }
+};
 
-    const allowed = ['image/png', 'image/jpeg', 'image/jpg'];
-    if (!allowed.includes(file.type)) {
-      alert('Solo se permiten imágenes PNG, JPG o JPEG.');
-      return;
-    }
+const handleImageUpload = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => setImagePreview(reader.result);
-    reader.readAsDataURL(file);
-  };
+  const allowed = ['image/png', 'image/jpeg', 'image/jpg'];
+  if (!allowed.includes(file.type)) {
+    alert('Solo se permiten imágenes PNG, JPG o JPEG.');
+    return;
+  }
+
+  setImageFile(file);
+  const reader = new FileReader();
+  reader.onloadend = () => setImagePreview(reader.result);
+  reader.readAsDataURL(file);
+};
+
 
   return (
     <>
@@ -95,7 +103,7 @@ function CreatePost() {
             <>
               <label className="block border border-dashed rounded p-4 text-center cursor-pointer">
                 <span>Sube una imagen (.png, .jpg, .jpeg)</span>
-                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                <input type="file" onChange={handleImageUpload} className="hidden" />
               </label>
               {imagePreview && <img src={imagePreview} alt="preview" className="mt-4 max-w-full max-h-60 mx-auto" />}
             </>

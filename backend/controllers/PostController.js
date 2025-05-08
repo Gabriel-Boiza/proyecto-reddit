@@ -2,7 +2,17 @@ import Post from "../models/Post.js"
 import User from "../models/User.js"
 import multer from "multer"
 
-const upload = multer({dest: "../uploads/"})
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./uploads/"); 
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+      cb(null, uniqueSuffix + "-" + file.originalname);
+    }
+  });
+  const upload = multer({ storage });
+
 
 
 export const getAllPosts = async (req, res) => {
@@ -35,38 +45,32 @@ export const getPostById = async (req, res) => {
 };
   
 
-export const createPost = async (req, res) => {
-    const { title, description } = req.body;
-    const user_id = req.user.id;
-
-    try {
+export const createPost = [
+    upload.single("file"), // "file" debe coincidir con el append() en FormData
+    async (req, res) => {
+      const { title, description } = req.body;
+      const user_id = req.user.id;
+  
+      try {
         const post = new Post({
-            title: title,
-            user_id: user_id,
-            description: description,
-            votes: {
-                upvotes: [],
-                downvotes: []
-            },  
-            file_url: "file_url",
-            comments: [],
+          title,
+          user_id,
+          description,
+          votes: { upvotes: [], downvotes: [] },
+          file_url: req.file ? req.file.filename : null,
+          comments: [],
         });
-
+  
         await post.save();
-
-        await User.findByIdAndUpdate(
-            user_id,
-            { $push: { posts: post._id } }, 
-            { new: true } 
-        );
-
+        await User.findByIdAndUpdate(user_id, { $push: { posts: post._id } });
+  
         res.json(post);
-
-    } catch (error) {
+      } catch (error) {
         console.error("Error al crear el post:", error);
         res.status(500).json({ message: "Error interno al crear el post." });
+      }
     }
-};
+  ];
 
 export const getPostsByCookie = async (req, res) => {
     try {
