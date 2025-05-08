@@ -12,15 +12,17 @@ function ViewPost(){
     const [post, setPost] = useState(null)
     
     const postData = async () => {
-        const providedData = await axios.get(`http://localhost:3000/getPostById/${id}`, {withCredentials: true})
-        setPost(providedData.data)        
+        try {
+            const providedData = await axios.get(`http://localhost:3000/getPostById/${id}`, {withCredentials: true})
+            setPost(providedData.data)  
+        } catch (error) {
+            console.log("ha petado")
+        }      
     }
     useEffect(() => {
         postData()
     }, [])
-    useEffect(() => {
-        console.log(post);
-    }, [post])
+
     return(
         <>
             <Header/>

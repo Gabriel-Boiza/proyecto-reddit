@@ -84,7 +84,7 @@ function CreatePost() {
               <div
                 ref={descriptionRef}
                 contentEditable
-                onInput={(e) => setDescription(e.target.innerHTML)} // Esto actualiza la descripción de acuerdo al contenido editable
+                onInput={(e) => setDescription(e.target.innerHTML)} 
                 className="w-full h-40 p-2 border rounded overflow-y-auto"
                 suppressContentEditableWarning
               ></div>

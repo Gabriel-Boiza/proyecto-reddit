@@ -11,7 +11,6 @@ const postSchema = new mongoose.Schema(
     },
     file_url: { type: String },
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
-    community_id: { type: mongoose.Schema.Types.ObjectId, ref: "Community" }
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: false },

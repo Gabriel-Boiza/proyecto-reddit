@@ -1,5 +1,8 @@
 import Post from "../models/Post.js"
 import User from "../models/User.js"
+import multer from "multer"
+
+const upload = multer({dest: "../uploads/"})
 
 
 export const getAllPosts = async (req, res) => {
