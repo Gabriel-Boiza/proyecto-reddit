@@ -72,6 +72,88 @@ export const createPost = [
     }
   ];
 
+  export const upVote = async (req, res) => {
+    const {post_id} = req.body
+    const post = await Post.findById(post_id)
+    let number = 0
+    let voteState = 1
+
+
+    if(!post.votes.upvotes.includes(req.user.id)){
+      post.votes.upvotes.push(req.user.id)
+      number = 1
+    }
+    else{
+     post.votes.upvotes = post.votes.upvotes.filter(item => item.toString() !== req.user.id)
+     number = -1
+     voteState = 0
+    }
+
+    if(post.votes.downvotes.includes(req.user.id)){
+      post.votes.downvotes = post.votes.downvotes.filter(item => item.toString() !== req.user.id)
+      number++
+    }
+
+    post.save()
+
+    res.json({number: number, voteState: voteState})
+
+  }
+
+  export const downVote = async (req, res) => {
+    const {post_id} = req.body
+    const post = await Post.findById(post_id)
+    let number = 0
+    let voteState = -1
+
+
+    if(!post.votes.downvotes.includes(req.user.id)){
+      post.votes.downvotes.push(req.user.id)
+      number = -1
+    }
+    else{
+     post.votes.downvotes = post.votes.downvotes.filter(item => item.toString() !== req.user.id)
+     number = 1
+     voteState = 0
+    }
+
+    if(post.votes.upvotes.includes(req.user.id)){
+      post.votes.upvotes = post.votes.upvotes.filter(item => item.toString() !== req.user.id)
+      number--
+    }
+
+    post.save()
+
+    res.json({number: number, voteState: voteState})
+  }
+
+  
+export const getVoteState = async (req, res) => {
+  const userId = req.user.id;
+  const { post_id } = req.body;
+
+  try {
+    const post = await Post.findById(post_id);
+
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    if (post.votes.upvotes.includes(userId)) {
+      return res.json({ voteState: 1 });
+    }
+
+    if (post.votes.downvotes.includes(userId)) {
+      return res.json({ voteState: -1 });
+    }
+
+    return res.json({ voteState: 0 });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 export const getPostsByCookie = async (req, res) => {
     try {
         const user_id = req.user.id;

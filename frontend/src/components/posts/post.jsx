@@ -2,24 +2,73 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { ArrowUp, ArrowDown, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../context/authContext";
+import axios from "axios"
 
 function Post({ post }) {
 
   const [counter, setCounter] = useState(post.votes.upvotes.length - post.votes.downvotes.length)
+  const [voteState, setVoteState] = useState(0) //0 no ha votado, 1 like, -1 dislike
+  const {isAuth} = useAuth()
 
-  const handleUpVote = (e) => {
+  const handleUpVote = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setCounter(prev => prev + 1)
-    console.log("Upvote");
+    if(!isAuth){
+      alert("Need to be logged")
+      return
+    }
+    try {
+      const response = await axios.post("http://localhost:3000/upvote", {post_id: post._id}, {withCredentials: true}) //devuelve 1 o -1
+      setCounter(prev => prev + response.data.number)
+      setVoteState(response.data.voteState)
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleDownVote = (e) => {
+  const handleDownVote = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setCounter(prev => prev - 1)
-    console.log("Downvote");
+    if(!isAuth){
+      alert("Need to be logged")
+      return
+    }
+    try {
+      const response = await axios.post("http://localhost:3000/downvote", {post_id: post._id}, {withCredentials: true}) //devuelve 1 o -1
+      setCounter(prev => prev + response.data.number)
+      setVoteState(response.data.voteState)
+    } catch (error) {
+      console.log(error);      
+    }
+  };
+
+
+  useEffect(() => {
+    if (!isAuth) return; 
+    axios.post("http://localhost:3000/getVoteState", {post_id: post._id}, {withCredentials: true})
+    .then(response => {
+      console.log(response.data.voteState);
+      setVoteState(response.data.voteState)
+    })
+    .catch(error => {
+      console.log(error);
+    })
+  }, [])
+
+
+  // Get the appropriate background color based on voteState
+  const getVoteContainerClass = () => {
+    const baseClasses = "flex items-center space-x-1 rounded-md transition-colors duration-200 px-2 py-1";
+    
+    if (voteState === 1) {
+      return `${baseClasses} bg-orange-500`; 
+    } else if (voteState === -1) {
+      return `${baseClasses} bg-purple-500`;
+    } else {
+      return baseClasses;
+    }
   };
 
   return (
@@ -47,23 +96,23 @@ function Post({ post }) {
           />
 
           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-            <div className="flex items-center space-x-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleUpVote}
-                className="p-1"
-              >
-                <ArrowUp className="w-4 h-4" />
-              </Button>
+            <div className={getVoteContainerClass()}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleUpVote}
+              className={`p-1 ${voteState === 1 ? "text-orange-500" : ""} cursor-pointer`}
+            >
+              <ArrowUp className="w-4 h-4 text-white font-bold" />
+            </Button>
               <span>{counter}</span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleDownVote}
-                className="p-1"
+                className={`p-1 ${voteState === -1 ? "text-purple-500" : ""} cursor-pointer`}
               >
-                <ArrowDown className="w-4 h-4" />
+                <ArrowDown className="w-4 h-4 text-white" />
               </Button>
             </div>
 
