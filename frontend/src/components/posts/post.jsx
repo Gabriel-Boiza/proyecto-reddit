@@ -5,7 +5,7 @@ import { ArrowUp, ArrowDown, MessageSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/authContext";
 import axios from "axios"
-
+import { domain } from "../../context/domain";
 function Post({ post }) {
 
   const [counter, setCounter] = useState(post.votes.upvotes.length - post.votes.downvotes.length)
@@ -20,7 +20,8 @@ function Post({ post }) {
       return
     }
     try {
-      const response = await axios.post("http://localhost:3000/upvote", {post_id: post._id}, {withCredentials: true}) //devuelve 1 o -1
+      const response = await axios.post(`${domain}upvote`, {post_id: post._id}, {withCredentials: true});
+
       setCounter(prev => prev + response.data.number)
       setVoteState(response.data.voteState)
     } catch (error) {
@@ -36,7 +37,8 @@ function Post({ post }) {
       return
     }
     try {
-      const response = await axios.post("http://localhost:3000/downvote", {post_id: post._id}, {withCredentials: true}) //devuelve 1 o -1
+      const response = await axios.post(`${domain}downvote`, {post_id: post._id}, {withCredentials: true});
+
       setCounter(prev => prev + response.data.number)
       setVoteState(response.data.voteState)
     } catch (error) {
@@ -47,7 +49,7 @@ function Post({ post }) {
 
   useEffect(() => {
     if (!isAuth) return; 
-    axios.post("http://localhost:3000/getVoteState", {post_id: post._id}, {withCredentials: true})
+    axios.post(`${domain}getVoteState`, {post_id: post._id}, {withCredentials: true})
     .then(response => {
       console.log(response.data.voteState);
       setVoteState(response.data.voteState)

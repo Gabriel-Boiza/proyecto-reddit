@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "./authContext";
+import { domain } from "./domain";
 
 const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
@@ -10,7 +11,7 @@ const AuthProvider = ({ children }) => {
 
     const login = async (user) => {
         try {
-            const data = await axios.post("http://localhost:3000/login", user, { withCredentials: true });
+            const data = await axios.post(`${domain}login`, user, { withCredentials: true });
             setIsAuth(true);
             setMessage("Login successful");
             setIsError(false);  
@@ -25,7 +26,7 @@ const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await axios.post("http://localhost:3000/logout", {}, { withCredentials: true });
+            await axios.post(`${domain}logout`, {}, { withCredentials: true });
             setIsAuth(false);
             setMessage("Logged out successfully");
             setIsError(false);
@@ -36,7 +37,7 @@ const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        axios.get("http://localhost:3000/check-auth", { withCredentials: true })
+        axios.get(`${domain}check-auth`, { withCredentials: true })
             .then(() => setIsAuth(true))
             .catch(() => setIsAuth(false))
             .finally(() => setLoading(false));

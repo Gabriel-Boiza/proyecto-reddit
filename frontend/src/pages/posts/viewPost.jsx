@@ -4,7 +4,7 @@ import Post from "../../components/posts/post"
 
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-
+import { domain } from "../../context/domain"
 import axios from "axios"
 
 function ViewPost(){
@@ -13,7 +13,7 @@ function ViewPost(){
     
     const postData = async () => {
         try {
-            const providedData = await axios.get(`http://localhost:3000/getPostById/${id}`, {withCredentials: true})
+            const providedData = await axios.get(`${domain}getPostById/${id}`, {withCredentials: true})
             setPost(providedData.data)  
         } catch (error) {
             console.log("ha petado")

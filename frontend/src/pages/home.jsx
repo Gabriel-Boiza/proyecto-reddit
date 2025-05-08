@@ -3,6 +3,7 @@ import Aside from "../layouts/aside";
 import Post from "../components/posts/post";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { domain } from "../context/domain";
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -14,7 +15,7 @@ function Home() {
 
   const postsData = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/getAllPosts", {
+      const response = await axios.get(`${domain}getAllPosts`, {
         withCredentials: true,
       });
       setPosts(response.data);

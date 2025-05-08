@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import Header from '../../layouts/header';
 import Aside from '../../layouts/aside';
+import { domain } from '../../context/domain';
 
 function CreatePost() {
   const [activeTab, setActiveTab] = useState('text');
@@ -22,7 +23,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    await axios.post('http://localhost:3000/createPost', formData, {
+    await axios.post(`${domain}createPost`, formData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'multipart/form-data',

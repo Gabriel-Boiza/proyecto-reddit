@@ -3,7 +3,7 @@ import Aside from "../../layouts/aside"
 import ProfilePost from "../../components/posts/profilePost"
 import axios from "axios"
 import { useEffect, useState } from "react"
-
+import { domain } from "../../context/domain"
 function Profile() {
 
     const [user, setUser] = useState({
@@ -23,7 +23,7 @@ function Profile() {
  
     const userData = async () => {
         try {
-            const response = await axios.get("http://localhost:3000/getUserByCookie", { withCredentials: true });
+            const response = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
             const providedUser = response.data.user;
             setUser(prevUser => ({
                 ...prevUser,
@@ -40,7 +40,7 @@ function Profile() {
 
     const userPosts = async () => {
         try {
-            const response = await axios.get("http://localhost:3000/getPostsByCookie", { withCredentials: true });
+            const response = await axios.get(`${domain}getPostsByCookie`, { withCredentials: true });
             setPosts(response.data.posts);
         } catch (error) {
             console.log("Error loading user posts:", error.response?.data?.message);

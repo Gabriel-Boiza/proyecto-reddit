@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { useEffect, useState } from 'react';
 import HeaderLogin from '../../layouts/headerLogin.jsx';
-
+import { domain } from '../../context/domain.js';
 function Register() {
   const navigate = useNavigate();
 
@@ -35,7 +35,7 @@ function Register() {
         email: user.email,
         password: user.password,
       }
-      axios.post("http://localhost:3000/register", userObject)
+      axios.post(`${domain}register`, userObject)
       .then(response => {
         setIsError(false)
         setMessage(response.data.message)
