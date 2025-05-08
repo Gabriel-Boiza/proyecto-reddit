@@ -1,9 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import HeaderLogin from '../../layouts/headerLogin.jsx';
 
 function Register() {
+  const navigate = useNavigate();
+
+  const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    console.log(message)
+  }, [message])
+  
   const [user, setUser] = useState({
     username: "",
     name: "",
@@ -28,14 +37,18 @@ function Register() {
       }
       axios.post("http://localhost:3000/register", userObject)
       .then(response => {
-        console.log(response);
+        setIsError(false)
+        setMessage(response.data.message)
+        setTimeout(() => navigate("/"), 500);
       })
       .catch(error => {
-        console.log(error.response?.data || error.message);
+        setIsError(true)
+        setMessage(error.response.data.message)
       })
 
     }
   };
+
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -112,6 +125,12 @@ function Register() {
                 Register
               </button>
             </form>
+
+            {message && (
+              <p className={`text-sm text-center mt-4 ${isError ? 'text-red-400' : 'text-green-400'}`}>
+                {message}
+              </p>
+            )}
 
             <p className="text-white text-sm text-center mt-4">
               Already registered? <Link to="/login" className="text-blue-400 hover:underline">Log In</Link>
