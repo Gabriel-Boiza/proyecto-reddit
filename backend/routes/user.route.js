@@ -8,6 +8,7 @@ const route = express.Router()
 route.get("/getAllUsers", UserController.getAllUsers)
 route.get("/getUserById/:id", UserController.getUserById)
 route.get("/getUserByCookie", auth.verifyToken, UserController.getUserByCookie)
+route.get("/getUserInteractions", auth.verifyToken, UserController.getUserInteractions);
 
 
 route.put("/editUser", auth.verifyToken, UserController.editUser)

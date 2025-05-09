@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Trash } from "lucide-react";
+import { Trash, ThumbsUp, ThumbsDown } from "lucide-react";
 import axios from 'axios';
 import { domain } from '../../context/domain';
 import Swal from 'sweetalert2';
@@ -69,7 +69,6 @@ function ProfilePost({ post, onDelete }) {
 
     return (
         <div key={post._id} className="mb-4">
-            <div className="border-t border-gray-600 mb-4"></div>
             <div className="relative">
                 <button
                     onClick={deletePost}
@@ -78,14 +77,37 @@ function ProfilePost({ post, onDelete }) {
                 >
                     <Trash className="w-4 h-4" color="red" />
                 </button>
-                <Link to={`/post/${post._id}`} className="block rounded-md p-4 hover:bg-gray-800">
-                    <h3 className="text-xl text-[#B7CAD4] font-semibold">{post.title}</h3>
-                    <p className="text-gray-400">{post.description}</p>
-                    <div className="mt-3 text-sm text-gray-500">
+                <Link
+                    to={`/post/${post._id}`}
+                    className="block rounded-md p-4 hover:bg-gray-800 w-[1200px] min-h-[200px] flex flex-col justify-between"
+                    >
+                    <div>
+                        <img
+                        src={`${domain}uploads/${post.file_url}` || "https://via.placeholder.com/150"}
+                        alt={post.title}
+                        className="w-18 h-18 rounded-md mb-2 float-left mr-2"
+                        />
+                        <h3 className="text-xl text-[#B7CAD4] font-semibold">{post.title}</h3>
+                        <p className="text-gray-400">{post.description}</p>
+                    </div>
+
+                    <div className="mt-auto">
+                        <div className="text-sm text-gray-500 mt-4">
                         <span>Posted at: {new Date(post.created_at).toLocaleString()}</span>
+                        </div>
+                        <div className="mt-2 text-sm text-gray-500 flex gap-4">
+                        <span className="flex items-center gap-1 text-green-400">
+                            <ThumbsUp size={16} />{post.votes?.upvotes?.length || 0}
+                        </span>
+                        <span className="flex items-center gap-1 text-red-400">
+                            <ThumbsDown size={16} />{post.votes?.downvotes?.length || 0}
+                        </span>
+                        </div>
                     </div>
                 </Link>
             </div>
+            <hr className="border-t border-gray-700 mt-6 mx-2" />
+
         </div>
     );
 }

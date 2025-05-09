@@ -2,7 +2,7 @@
 @import "./aside.css";
 @import "./header.css";
 @import "./login.css";
-
+@import "./profilePosts.css";
 
 body {
     background-color: #14181a;

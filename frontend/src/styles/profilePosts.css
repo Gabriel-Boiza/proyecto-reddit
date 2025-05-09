@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+.scrollPosts::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollPosts::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollPosts::-webkit-scrollbar-thumb {
+    background-color: #4B5563; /* Gris suave (puedes cambiarlo) */
+    border-radius: 4px;
+  }
+  
+  .scrollPosts::-webkit-scrollbar-thumb:hover {
+    background-color: #6B7280; /* Gris más claro al pasar el mouse */
+  }
+  
+  /* Firefox */
+  .scrollPosts {
+    scrollbar-width: thin;
+    scrollbar-color: #4B5563 transparent;
+  }
+  

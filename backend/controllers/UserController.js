@@ -54,6 +54,36 @@ export const getUserByCookie = async (req, res) => {
     }
 };
 
+export const getUserInteractions = async (req, res) => {
+    try {
+        const decoded = jwt.verify(req.cookies.access_token, process.env.SECRET_JWT_KEY);
+        const userId = decoded.id;
+
+        // Comentarios con posts asociados
+        const user = await User.findById(userId).populate({
+            path: 'comments',
+            options: { sort: { createdAt: -1 } }
+        });
+
+        const commentsWithPosts = await Promise.all(user.comments.map(async comment => {
+            const post = await Post.findOne({ comments: comment._id });
+            return post ? { comment, post } : null;
+        }));
+
+        // Posts upvoted y downvoted
+        const upvotedPosts = await Post.find({ "votes.upvotes": userId }).sort({ created_at: -1 });
+        const downvotedPosts = await Post.find({ "votes.downvotes": userId }).sort({ created_at: -1 });
+
+        res.json({
+            commentsWithPosts: commentsWithPosts.filter(Boolean),
+            upvotedPosts,
+            downvotedPosts
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch interactions" });
+    }
+};
 
 
 export const editUser = async (req, res) => {
