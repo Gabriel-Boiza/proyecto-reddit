@@ -30,11 +30,14 @@ function ViewPost(){
             <Aside/>
             <div className="p-6 max-w-4xl mx-auto space-y-6">
                 {post ? (
-                    <Post key={post._id} post={post} />
+                    <>
+                    <Post post={post} />
+                    <CommentForm post_id={id}/>
+                    </>
                 ) : (
                     <p>Cargando post...</p>
                 )}
-            <CommentForm/>
+            
             </div>
             
             

@@ -1,58 +1,129 @@
-import { useState } from 'react';
-import { Send } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Image } from 'lucide-react';
+import axios from 'axios';
+import { domain } from '../../context/domain';
 
-const CommentForm = () => {
+const CommentForm = ({post_id}) => {
   const [comment, setComment] = useState('');
+  const [notification, setNotification] = useState({ message: '', type: '' });
+  const textareaRef = useRef(null);
+  const MAX_CHARS = 150;
   
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Placeholder for your logic
-    console.log('Comment submitted:', comment);
-    setComment('');
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${domain}createComment`, 
+        {post_id: post_id, comment: comment}, 
+        {withCredentials: true}
+      );
+      
+      setComment('');
+      setNotification({ message: response.data.message, type: 'success' });
+      
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Error al enviar el comentario';
+      setNotification({ message: errorMessage, type: 'error' });
+    }
   };
+  
+  // Auto-resize textarea as content grows
+  const handleTextareaChange = (e) => {
+    const textarea = e.target;
+    const value = textarea.value;
+    
+    // Apply character limit
+    if (value.length <= MAX_CHARS) {
+      setComment(value);
+      
+      // Reset height to get the correct scrollHeight
+      textarea.style.height = 'auto';
+      
+      // Set new height based on scrollHeight with a minimum height
+      const newHeight = Math.max(40, textarea.scrollHeight);
+      textarea.style.height = `${newHeight}px`;
+    }
+  };
+  
+  // Reset height when comment is cleared
+  useEffect(() => {
+    if (comment === '' && textareaRef.current) {
+      textareaRef.current.style.height = '40px';
+    }
+  }, [comment]);
 
+  // Clear notification after 5 seconds
+  useEffect(() => {
+    if (notification.message) {
+      const timer = setTimeout(() => {
+        setNotification({ message: '', type: '' });
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
+  const handleCancel = () => {
+    setComment('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = '40px';
+    }
+  };
+  
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full">
+            <div className="rounded-lg border border-white flex flex-col">
 
-        <form 
-        onSubmit={handleSubmit}
-        className="rounded-lg flex items-center border border-white"
-        >
-        <button 
-          type="button"
-          className="mr-2 p-2 text-gray-400 hover:text-gray-300 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </button>
-        
-        <div className="flex-1 relative">
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Add a comment..."
-            className="w-full bg-transparent border-none focus:ring-0 outline-none text-white resize-none py-2 px-1 h-10 max-h-40"
-            style={{ minHeight: '40px' }}
-          />
+        {/* Textarea area */}
+        <div className="p-3">
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              value={comment}
+              onChange={handleTextareaChange}
+              placeholder="Añade un comentario..."
+              className="w-full rounded p-3 text-gray-200 min-h-[40px] resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+              style={{
+                overflow: comment.length > 100 ? 'auto' : 'hidden'
+              }}
+            />
+          </div>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <button 
-            type="button" 
-            className="px-3 py-1.5 rounded text-gray-300 hover:text-gray-100"
-          >
-            Cancel
-          </button>
-          <button 
-            type="submit" 
-            className={`px-4 py-1.5 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors ${!comment.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={!comment.trim()}
-          >
-            Comment
-          </button>
+        {/* Notification message */}
+        {notification.message && (
+          <div className={`ml-3 mb-2 px-3 py-1 rounded text-sm inline-block ${
+            notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          }`}>
+            {notification.message}
+          </div>
+        )}
+        
+        {/* Buttons and character count */}
+        <div className="flex justify-end items-center p-2 border-t border-gray-700">
+          <span className="text-gray-400 mr-4 text-sm">
+            {comment.length}/{MAX_CHARS}
+          </span>
+          <div className="flex items-center space-x-2">
+            <button 
+              type="button"
+              onClick={handleCancel}
+              className="px-3 py-1.5 rounded text-gray-300 hover:text-gray-100"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleSubmit}
+              className={`px-4 py-1.5 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors ${!comment.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={!comment.trim()}
+            >
+              Comment
+            </button>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

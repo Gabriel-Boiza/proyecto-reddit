@@ -6,7 +6,7 @@ import connectDB from "./config/db.js"
 import usersRouter from "./routes/user.route.js"
 import postsRouter from "./routes/post.route.js"
 import authRouter from "./routes/auth.routes.js"
-
+import commentRouter from "./routes/comment.routes.js"  
 
 dotenv.config()
 connectDB()
@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 app.use("/", usersRouter)
 app.use("/", postsRouter)
 app.use("/", authRouter)
-
+app.use("/", commentRouter)
 
 
 const PORT = process.env.PORT || 3000
