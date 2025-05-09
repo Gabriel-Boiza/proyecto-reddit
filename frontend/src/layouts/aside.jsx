@@ -4,7 +4,7 @@ function Aside() {
   return (
     <>
       <div className="flex">
-        <aside className="aside">
+        <aside className="aside" id="asideMenu">
           <nav className="aside-nav">
             <p className="aside-title">TOPICS</p>
             <a href="#" className="aside-links">Games</a>
