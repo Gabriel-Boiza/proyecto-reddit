@@ -3,6 +3,7 @@ import axios from 'axios';
 import Header from '../../layouts/header';
 import Aside from '../../layouts/aside';
 import { domain } from '../../context/domain';
+import { useNavigate } from 'react-router-dom';
 
 function CreatePost() {
   const [activeTab, setActiveTab] = useState('text');
@@ -11,51 +12,49 @@ function CreatePost() {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const descriptionRef = useRef(null);
+  const navigate = useNavigate();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const formData = new FormData();
-  formData.append('title', title);
-  formData.append('description', description);
-  if (imageFile) {
-    formData.append('file', imageFile);
-  }
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    if (imageFile) {
+      formData.append('file', imageFile);
+    }
 
-  try {
-    await axios.post(`${domain}createPost`, formData, {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    try {
+      const response = await axios.post(`${domain}createPost`, formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-    setTitle('');
-    setDescription('');
-    setImageFile(null);
-    setImagePreview(null);
-    if (descriptionRef.current) descriptionRef.current.innerHTML = '';
-  } catch (error) {
-    console.error('Error creating post:', error);
-  }
-};
+      const postId = response.data._id;
+      navigate(`/post/${postId}`); // Redirige a la vista del post
 
-const handleImageUpload = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
+  };
 
-  const allowed = ['image/png', 'image/jpeg', 'image/jpg'];
-  if (!allowed.includes(file.type)) {
-    alert('Solo se permiten imágenes PNG, JPG o JPEG.');
-    return;
-  }
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  setImageFile(file);
-  const reader = new FileReader();
-  reader.onloadend = () => setImagePreview(reader.result);
-  reader.readAsDataURL(file);
-};
+    const allowed = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowed.includes(file.type)) {
+      alert('Solo se permiten imágenes PNG, JPG o JPEG.');
+      return;
+    }
 
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
+  };
 
   return (
     <>
@@ -89,15 +88,13 @@ const handleImageUpload = (e) => {
           />
 
           {activeTab === 'text' && (
-            <>
-              <div
-                ref={descriptionRef}
-                contentEditable
-                onInput={(e) => setDescription(e.target.innerHTML)} 
-                className="w-full h-40 p-2 border rounded overflow-y-auto"
-                suppressContentEditableWarning
-              ></div>
-            </>
+            <div
+              ref={descriptionRef}
+              contentEditable
+              onInput={(e) => setDescription(e.target.innerHTML)} 
+              className="w-full h-40 p-2 border rounded overflow-y-auto"
+              suppressContentEditableWarning
+            ></div>
           )}
 
           {activeTab === 'image' && (

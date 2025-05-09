@@ -1,23 +1,24 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from "react";
 import HeaderLogin from '../../layouts/headerLogin.jsx';
-
 import { useAuth } from '../../context/authContext.js';
 
 function Login() {
   const navigate = useNavigate();
-  const { login, message, isError} = useAuth();
+  const location = useLocation();
+  const { login, message, isError } = useAuth();
 
   const [user, setUser] = useState({ email: "", password: "" });
+
+  const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const success = await login(user);
     if (success) {
-      setTimeout(() => navigate("/"), 500);
+      setTimeout(() => navigate(from, { replace: true }), 500);
     }
-
   };
 
   const handleUsernameInput = (e) => {
