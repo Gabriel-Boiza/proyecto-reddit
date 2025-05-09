@@ -168,3 +168,13 @@ export const getPostsByCookie = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
+
+export const deletePost = async (req, res) => {
+  const {post_id} = req.body
+  try {
+    await Post.findByIdAndDelete(post_id)
+    res.json({message: "Post deleted successfull"})
+  } catch (error) {
+    res.json({message: error.message})
+  }
+}

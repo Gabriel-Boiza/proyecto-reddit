@@ -15,6 +15,6 @@ route.post("/getVoteState", authMiddleware.verifyToken, PostController.getVoteSt
 
 
 route.post("/createPost", authMiddleware.verifyToken , PostController.createPost)
-
+route.delete("/deletePost", authMiddleware.verifyToken, PostController.deletePost)
 
 export default route

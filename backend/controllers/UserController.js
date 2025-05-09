@@ -22,7 +22,7 @@ export const getUserById = async (req, res) => {
 }
 
 export const getUserByCookie = async (req, res) => {
-    const token = req.cookies.acces_token
+    const token = req.cookies.access_token
     res.json({user: jwt.verify(token, process.env.SECRET_JWT_KEY)})
 }
 
