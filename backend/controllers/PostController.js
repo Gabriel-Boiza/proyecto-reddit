@@ -170,11 +170,12 @@ export const getPostsByCookie = async (req, res) => {
 };
 
 export const deletePost = async (req, res) => {
-  const {post_id} = req.body
+  const { post_id } = req.body; // CAMBIADO de req.body.data a req.body
   try {
-    await Post.findByIdAndDelete(post_id)
-    res.json({message: "Post deleted successfull"})
+    await Post.findByIdAndDelete(post_id);
+    res.json({ message: "Post deleted successfully" });
   } catch (error) {
-    res.json({message: error.message})
+    console.error("Error deleting post:", error); // Añade logging
+    res.status(500).json({ message: error.message }); // Mejora el status de error
   }
-}
+};

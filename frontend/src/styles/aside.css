@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .aside {
-    @apply fixed left-0 w-80 text-white max-h-screen overflow-y-auto p-6 border-r border-[#3E4042] bg-[#14181a];
+  @apply hidden sm:block sm:fixed sm:left-0 sm:w-80 sm:text-white sm:max-h-screen sm:overflow-y-auto sm:p-6 sm:border-r sm:border-[#3E4042] sm:bg-[#14181a];
 }
 
 .aside-links {
