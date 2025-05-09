@@ -29,3 +29,26 @@ export const createComment = async (req, res) => {
         res.json({message: error.message})
     }
 }
+
+export const getCommentsByPost = async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        // Encuentra el post y rellena el campo 'comments' con los datos completos de los comentarios
+        const post = await Post.findById(id).populate('comments');
+        
+        // Asegúrate de que no haya duplicados en la respuesta
+        console.log('Post Comments:', post.comments);
+
+        // Si no se encuentra el post
+        if (!post) {
+            return res.status(404).json({ message: 'Post no encontrado' });
+        }
+
+        // Devuelve los comentarios completos
+        res.json({ comments: post.comments });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener los comentarios' });
+    }
+};

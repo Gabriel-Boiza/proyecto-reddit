@@ -74,7 +74,7 @@ const CommentForm = ({post_id}) => {
   
   return (
     <div className="w-full">
-            <div className="rounded-lg border border-white flex flex-col">
+      <div className="rounded-lg border border-zinc-700 flex flex-col">
 
         {/* Textarea area */}
         <div className="p-3">
@@ -84,7 +84,7 @@ const CommentForm = ({post_id}) => {
               value={comment}
               onChange={handleTextareaChange}
               placeholder="Añade un comentario..."
-              className="w-full rounded p-3 text-gray-200 min-h-[40px] resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded p-3 text-gray-200 min-h-[40px] resize-none focus:outline-none"
               style={{
                 overflow: comment.length > 100 ? 'auto' : 'hidden'
               }}
@@ -102,7 +102,7 @@ const CommentForm = ({post_id}) => {
         )}
         
         {/* Buttons and character count */}
-        <div className="flex justify-end items-center p-2 border-t border-gray-700">
+        <div className="flex justify-end items-center p-2">
           <span className="text-gray-400 mr-4 text-sm">
             {comment.length}/{MAX_CHARS}
           </span>

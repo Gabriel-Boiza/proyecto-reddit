@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom"
 import { domain } from "../../context/domain"
 import axios from "axios"
 import CommentForm from "../../components/posts/createComment"
+import Comment from "../../components/posts/comment"
 
 function ViewPost(){
     const {id} = useParams() //recoge el parametro id
@@ -33,6 +34,7 @@ function ViewPost(){
                     <>
                     <Post post={post} />
                     <CommentForm post_id={id}/>
+                    <Comment post_id={id}/>
                     </>
                 ) : (
                     <p>Cargando post...</p>

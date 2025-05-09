@@ -51,7 +51,6 @@ function Post({ post }) {
     if (!isAuth) return; 
     axios.post(`${domain}getVoteState`, {post_id: post._id}, {withCredentials: true})
     .then(response => {
-      console.log(response.data.voteState);
       setVoteState(response.data.voteState)
     })
     .catch(error => {
