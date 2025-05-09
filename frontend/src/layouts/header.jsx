@@ -8,7 +8,7 @@ function Header() {
 
   return (
     <header className="header">
-      <button id="botonDesplegableAside" className="md:hidden" aria-label="Toggle Menu">
+      <button id="botonDesplegableAside" className="md:hidden mt-2" aria-label="Toggle Menu">
         <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
           <rect y="5" width="20" height="2" rx="2" fill="gray" />
           <rect y="11" width="20" height="2" rx="2" fill="gray" />
@@ -40,15 +40,11 @@ function Header() {
             <Link to="/" onClick={() => logout()} className="login-button">Logout</Link>
           </>
         )}
-
-        <button id="BotonDesplegableUsuario" className="px-2 hover:bg-[#333d42] rounded-full" aria-label="User Menu">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="5" cy="12" r="2" fill="white" />
-            <circle cx="12" cy="12" r="2" fill="white" />
-            <circle cx="19" cy="12" r="2" fill="white" />
-          </svg>
+        <button id="botonDesplegableUser" className="md:hidden" aria-label="User Menú">
+          <img className="md:w-10 rounded-full w-16 ml-2" src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png" alt="" />
         </button>
       </div>
+
     </header>
   );
 }
