@@ -29,32 +29,26 @@ const CommentForm = ({post_id}) => {
     }
   };
   
-  // Auto-resize textarea as content grows
   const handleTextareaChange = (e) => {
     const textarea = e.target;
     const value = textarea.value;
     
-    // Apply character limit
     if (value.length <= MAX_CHARS) {
       setComment(value);
       
-      // Reset height to get the correct scrollHeight
       textarea.style.height = 'auto';
       
-      // Set new height based on scrollHeight with a minimum height
       const newHeight = Math.max(40, textarea.scrollHeight);
       textarea.style.height = `${newHeight}px`;
     }
   };
   
-  // Reset height when comment is cleared
   useEffect(() => {
     if (comment === '' && textareaRef.current) {
       textareaRef.current.style.height = '40px';
     }
   }, [comment]);
 
-  // Clear notification after 5 seconds
   useEffect(() => {
     if (notification.message) {
       const timer = setTimeout(() => {
@@ -76,7 +70,6 @@ const CommentForm = ({post_id}) => {
     <div className="w-full">
       <div className="rounded-lg border border-zinc-700 flex flex-col">
 
-        {/* Textarea area */}
         <div className="p-3">
           <div className="relative">
             <textarea
@@ -92,7 +85,6 @@ const CommentForm = ({post_id}) => {
           </div>
         </div>
         
-        {/* Notification message */}
         {notification.message && (
           <div className={`ml-3 mb-2 px-3 py-1 rounded text-sm inline-block ${
             notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -101,7 +93,6 @@ const CommentForm = ({post_id}) => {
           </div>
         )}
         
-        {/* Buttons and character count */}
         <div className="flex justify-end items-center p-2">
           <span className="text-gray-400 mr-4 text-sm">
             {comment.length}/{MAX_CHARS}

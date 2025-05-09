@@ -12,6 +12,7 @@ const Comment = ({ post_id }) => {
     try {
       setIsLoading(true);
       const response = await axios.get(`${domain}getCommentsByPost/${post_id}`);
+      console.log(response.data);
       setComments(response.data.comments || []);
       setError(null);
     } catch (err) {
@@ -26,10 +27,8 @@ const Comment = ({ post_id }) => {
     fetchComments();
   }, [post_id]);
 
-  // Función para formatear la fecha relativa
   const formatRelativeTime = (timestamp) => {
-    // Implementación básica para demostración
-    // En producción, usar una librería como date-fns o dayjs
+
     if (!timestamp) return "hace un momento";
     
     const now = new Date();
@@ -47,7 +46,7 @@ const Comment = ({ post_id }) => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
+    <div className="w-full">
       {/* Contador de comentarios */}
       <div className="flex items-center mb-4 text-zinc-400">
         <MessageCircle size={18} className="mr-2" />
@@ -98,11 +97,11 @@ const Comment = ({ post_id }) => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <h4 className="font-medium text-zinc-200">
-                    {comment.user?.name || "Usuario"}
+                    {comment.user?.username || "Anon"}
                   </h4>
                   <div className="flex items-center text-xs text-zinc-500">
                     <Clock size={12} className="mr-1" />
-                    <span>{formatRelativeTime(comment.createdAt)}</span>
+                    <span>{formatRelativeTime(comment.created_at)}</span>
                   </div>
                 </div>
                 <p className="text-zinc-300 break-words whitespace-pre-wrap">{comment.text}</p>

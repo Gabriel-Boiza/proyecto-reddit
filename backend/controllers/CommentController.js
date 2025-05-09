@@ -15,7 +15,8 @@ export const createComment = async (req, res) => {
 
         
         const submitedComment = await Comment.create({
-            text: comment
+            text: comment,
+            user: user_id
         })
 
         post.comments.push(submitedComment._id)
@@ -31,24 +32,27 @@ export const createComment = async (req, res) => {
 }
 
 export const getCommentsByPost = async (req, res) => {
-    const { id } = req.params;
-    
-    try {
-        // Encuentra el post y rellena el campo 'comments' con los datos completos de los comentarios
-        const post = await Post.findById(id).populate('comments');
-        
-        // Asegúrate de que no haya duplicados en la respuesta
-        console.log('Post Comments:', post.comments);
+  const { id } = req.params;
 
-        // Si no se encuentra el post
-        if (!post) {
-            return res.status(404).json({ message: 'Post no encontrado' });
+  try {
+    const post = await Post.findById(id)
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'user',
+          select: 'username email' 
         }
+      });
 
-        // Devuelve los comentarios completos
-        res.json({ comments: post.comments });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error al obtener los comentarios' });
+    if (!post) {
+      return res.status(404).json({ message: 'Post no encontrado' });
     }
+
+    res.json({ comments: post.comments });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: 'Error al obtener los comentarios' });
+  }
 };
+
