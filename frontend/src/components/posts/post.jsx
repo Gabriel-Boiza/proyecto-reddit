@@ -73,6 +73,7 @@ function Post({ post }) {
   };
 
   return (
+    <>
     <Link to={`/post/${post._id}`} className="block">
       <Card className="bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-colors duration-200 cursor-pointer">
         <CardContent className="p-4">
@@ -90,11 +91,14 @@ function Post({ post }) {
           </div>
           <h2 className="text-lg font-semibold">{post.title}</h2>
           <p className="text-sm text-gray-400 mb-3">{post.description}</p>
-          <img
-            src={post?.file_url ? `${domain}uploads/${post.file_url}` : '/default.png'}
-            alt="post"
-            className="rounded-lg border border-muted shadow mb-3 w-full object-cover"
-          />
+          {post?.file_url && (
+            <img
+              src={`${domain}uploads/${post.file_url}`}
+              alt="post"
+              className="rounded-lg border-muted shadow mb-3 w-full object-cover"
+            />
+          )}
+
 
           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
             <div className={getVoteContainerClass()}>
@@ -125,6 +129,8 @@ function Post({ post }) {
         </CardContent>
       </Card>
     </Link>
+    <hr className="border-t border-gray-700 mt-6 mx-2" />
+    </>
   );
 }
 

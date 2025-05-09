@@ -2,9 +2,11 @@ import React from "react";
 
 export function Card({ children, className = "" }) {
   return (
-    <div className={`bg-zinc-900 border border-zinc-700 rounded-xl shadow ${className}`}>
+    <>
+    <div className={`bg-zinc-850 border-zinc-700 rounded-xl shadow ${className}`}>
       {children}
     </div>
+    </>
   );
 }
 

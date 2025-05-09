@@ -22,9 +22,38 @@ export const getUserById = async (req, res) => {
 }
 
 export const getUserByCookie = async (req, res) => {
-    const token = req.cookies.access_token
-    res.json({user: jwt.verify(token, process.env.SECRET_JWT_KEY)})
-}
+    try {
+        const decoded = jwt.verify(req.cookies.access_token, process.env.SECRET_JWT_KEY);
+        const userId = decoded.id;
+
+        const posts = await Post.find({ user_id: userId });
+        const user = await User.findById(userId).select("-password");
+
+        // Sumar upvotes y downvotes de los posts
+        const upvotes = posts.reduce((acc, post) => acc + (post.votes?.upvotes?.length || 0), 0);
+        const downvotes = posts.reduce((acc, post) => acc + (post.votes?.downvotes?.length || 0), 0);
+
+        // Sumar total de comentarios que tienen sus posts
+        const commentCount = posts.reduce((acc, post) => acc + (post.comments?.length || 0), 0);
+
+        res.json({
+            user: {
+                id: user._id,
+                username: user.username,
+                name: user.name,
+                age: user.age,
+                postCount: posts.length,
+                commentCount,
+                upvotes,
+                downvotes
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(401).json({ message: "Invalid token or user" });
+    }
+};
+
 
 
 export const editUser = async (req, res) => {
