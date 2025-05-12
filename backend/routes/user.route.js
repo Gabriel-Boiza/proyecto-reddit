@@ -11,9 +11,10 @@ route.get("/getUserByCookie", auth.verifyToken, UserController.getUserByCookie)
 route.get("/getUserInteractions", auth.verifyToken, UserController.getUserInteractions);
 
 
-route.put("/editUser", auth.verifyToken, UserController.editUser)
+route.put('/editUser', auth.verifyToken, UserController.editUser);
 
-route.delete("/deleteUser/:id", auth.verifyToken, UserController.deleteUser)
+
+route.delete("/deleteAccount", auth.verifyToken, UserController.deleteUser)
 
 route.get('/getUserPosts/:id', UserController.getUserPosts)
 route.get('/getUserComments/:id', UserController.getUserComments)

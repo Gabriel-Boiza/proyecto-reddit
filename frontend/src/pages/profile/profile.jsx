@@ -10,42 +10,38 @@ import Swal from 'sweetalert2';
 
 function Profile({ post, onDelete }) {
 
-    const deletePost = async (e) => {
+    const deletePost = async (e, postId) => {
         e.preventDefault();
         e.stopPropagation();
 
-        // Mostrar el popup de confirmación con estilo personalizado
         const result = await Swal.fire({
             title: '¿Estás seguro?',
             text: "¡Este post será eliminado permanentemente!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#FF6600',  // Naranja como color principal
+            confirmButtonColor: '#FF6600',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
-            background: '#1c1c1c',  // Fondo oscuro
-            color: '#ffffff', // Texto blanco
+            background: '#1c1c1c',
+            color: '#ffffff',
             customClass: {
-                title: 'text-orange-500', // Título con color naranja
-                content: 'text-gray-300', // Contenido en gris claro
-                confirmButton: 'text-white border-none', // Botón de confirmación con texto blanco
-                cancelButton: 'text-white border-none', // Botón de cancelación con texto blanco
+                title: 'text-orange-500',
+                content: 'text-gray-300',
+                confirmButton: 'text-white border-none',
+                cancelButton: 'text-white border-none',
             },
         });
 
         if (result.isConfirmed) {
             try {
-                // Hacer la solicitud para eliminar el post
                 await axios.delete(`${domain}deletePost`, {
-                    data: { post_id: post._id },
+                    data: { post_id: postId },
                     withCredentials: true
                 });
 
-                // Llamar la función onDelete para actualizar el estado en el componente padre
-                if (onDelete) onDelete(post._id);
+                if (onDelete) onDelete(postId);
 
-                // Mostrar un mensaje de éxito
                 Swal.fire({
                     title: 'Eliminado!',
                     text: 'El post ha sido eliminado.',
@@ -60,16 +56,12 @@ function Profile({ post, onDelete }) {
                     },
                 });
             } catch (err) {
-                // Manejar el error si algo sale mal
                 console.error("Error deleting post:", err);
-                Swal.fire(
-                    'Error',
-                    'Hubo un problema al eliminar el post.',
-                    'error'
-                );
+                Swal.fire('Error', 'Hubo un problema al eliminar el post.', 'error');
             }
         }
     };
+
 
     const [user, setUser] = useState({
         username: "",
@@ -151,6 +143,55 @@ function Profile({ post, onDelete }) {
             });
     };
 
+    const deleteAccount = async () => {
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡Tu cuenta será eliminada permanentemente!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#FF6600',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar cuenta',
+            cancelButtonText: 'Cancelar',
+            background: '#1c1c1c',
+            color: '#ffffff',
+            customClass: {
+                title: 'text-orange-500',
+                content: 'text-gray-300',
+                confirmButton: 'text-white border-none',
+                cancelButton: 'text-white border-none',
+            },
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`${domain}deleteAccount`, { withCredentials: true });
+                
+                // Aquí puedes redirigir al usuario o mostrar un mensaje de éxito
+                Swal.fire({
+            title: 'Cuenta eliminada!',
+            text: 'Tu cuenta ha sido eliminada.',
+            icon: 'success',
+            background: '#1c1c1c',
+            color: '#ffffff',
+            confirmButtonColor: '#FF6600',
+            customClass: {
+                title: 'text-orange-500',
+                content: 'text-gray-300',
+                confirmButton: 'text-white border-none',
+            },
+        }).then(() => {
+            window.location.href = '/';  // Redirige al home o a la página principal
+        });
+
+            } catch (err) {
+                console.error("Error deleting account:", err);
+                Swal.fire('Error', 'Hubo un problema al eliminar la cuenta.', 'error');
+            }
+        }
+    };
+
+
     return (
         <>
             <Header />
@@ -219,21 +260,20 @@ function Profile({ post, onDelete }) {
                                 <div className="max-h-[600px] overflow-y-auto pr-2">
                                     {posts.length > 0 ? (
                                         posts.map(post => (
-                                            posts.map(post => (
                                                 <div key={post._id}>
                                                     <div>
-                                                        <button
-                                                            onClick={deletePost}
-                                                            className="absolute right-4 top-4 gap-2 bg-[#2a3236] hover:bg-[#333D42] text-white font-bold px-2 py-2 rounded-2xl z-10"
-                                                            aria-label="Delete Post">
-                                                            <Trash className="w-4 h-4" color="red" />
-                                                        </button>
                                                         <Link
                                                             to={`/post/${post._id}`}
                                                             className="block rounded-md p-4 hover:bg-gray-800 w-[1200px] flex flex-col justify-between"
                                                             >
                                                             <div className="relative rounded-md p-4 hover:bg-gray-800 ">
 
+                                                        <button
+                                                            onClick={(e) => deletePost(e, post._id)}
+                                                            className="absolute right-4 top-4 gap-2 bg-[#2a3236] hover:bg-[#333D42] text-white font-bold px-2 py-2 rounded-2xl z-10"
+                                                            aria-label="Delete Post">
+                                                            <Trash className="w-4 h-4" color="red" />
+                                                        </button>
                                                                 <img
                                                                 src={`${domain}uploads/${post.file_url}` || "https://via.placeholder.com/150"}
                                                                 alt={post.title}
@@ -261,7 +301,6 @@ function Profile({ post, onDelete }) {
                                                     <hr className="border-t border-gray-700 mt-6 mx-2" />
 
                                                 </div>
-                                            ))
                                         ))
                                     ) : (
                                         <p className="text-gray-500">No posts to show</p>
@@ -410,12 +449,7 @@ function Profile({ post, onDelete }) {
 
 
 
-
-
-
-
-
-                    <article className="p-10 h-[550px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
+                    <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-white font-bold">{user.username}</h2>
                         </div>
@@ -449,7 +483,9 @@ function Profile({ post, onDelete }) {
                                     <img className="w-8 rounded-full" src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png" alt="" />
                                     <div>
                                         <p className="text-white text-sm">Profile</p>
-                                        <p className="text-xs">Customize your profile</p>
+                                        <Link to="/editProfile" className="text-xs">
+                                            Customize your profile
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
@@ -479,6 +515,21 @@ function Profile({ post, onDelete }) {
                                             Copy to Clipboard
                                         </button>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr className="border-gray-700 my-4 mx-2" />
+
+                        <div>
+                            <h3 className="text-xs font-bold text-gray-400 mb-2">DELETE ACCOUNT</h3>
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <button 
+                                        onClick={deleteAccount} 
+                                        className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md w-full"
+                                    >
+                                        Delete account
+                                    </button>
                                 </div>
                             </div>
                         </div>

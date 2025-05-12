@@ -87,21 +87,47 @@ export const getUserInteractions = async (req, res) => {
 
 
 export const editUser = async (req, res) => {
-    res.send(req.body)
-}
+  const { name, username, password } = req.body;
+  const userId = req.user.id; // Suponiendo que el middleware auth agrega el ID del usuario
+
+  if (!name || !username || !password) {
+    return res.status(400).json({ message: 'Faltan datos para actualizar el usuario' });
+  }
+
+  try {
+    // Cifrar la contraseña si se cambia
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Actualizar el usuario en la base de datos
+    const updatedUser = await User.findByIdAndUpdate(
+      userId, 
+      { name, username, password: hashedPassword }, 
+      { new: true } // Retorna el usuario actualizado
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json({ message: 'Usuario actualizado correctamente', updatedUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar el usuario' });
+  }
+};
 
 export const deleteUser = async (req, res) => {
-    const params = req.params 
-    const id = params.id
+    const userId = req.user.id;  // Suponiendo que el id del usuario está en req.user
     try {
-        const user = await User.findById(id)
-        if(!user){throw new Error("User not found")}
-        await user.deleteOne()
-        res.json({message: "OK"})
+        const user = await User.findById(userId);  // Busca al usuario por el id
+        if (!user) {
+            throw new Error("User not found");
+        }
+        await user.deleteOne();  // Elimina el usuario de la base de datos
+        res.json({ message: "OK" });
     } catch (error) {
-        res.status(404).json({message: error.message})
+        res.status(404).json({ message: error.message });
     }
-    
 }
 
 export const getUserPosts = async (req, res) => {
