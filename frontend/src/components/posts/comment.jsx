@@ -16,8 +16,8 @@ const Comment = ({ post_id }) => {
       setComments(response.data.comments || []);
       setError(null);
     } catch (err) {
-      console.error("Error al cargar comentarios:", err);
-      setError("No se pudieron cargar los comentarios. Intenta de nuevo más tarde.");
+      console.error("Error loading comments:", err);
+      setError("Failed to load comments. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -29,39 +29,39 @@ const Comment = ({ post_id }) => {
 
   const formatRelativeTime = (timestamp) => {
 
-    if (!timestamp) return "hace un momento";
+    if (!timestamp) return "just now";
     
     const now = new Date();
     const commentTime = new Date(timestamp);
     const diffInMinutes = Math.floor((now - commentTime) / (1000 * 60));
     
-    if (diffInMinutes < 1) return "justo ahora";
-    if (diffInMinutes < 60) return `hace ${diffInMinutes} ${diffInMinutes === 1 ? 'minuto' : 'minutos'}`;
+    if (diffInMinutes < 1) return "just now";
+    if (diffInMinutes < 60) return `about ${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'}`;
     
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `hace ${diffInHours} ${diffInHours === 1 ? 'hora' : 'horas'}`;
+    if (diffInHours < 24) return `about ${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'}`;
     
     const diffInDays = Math.floor(diffInHours / 24);
-    return `hace ${diffInDays} ${diffInDays === 1 ? 'día' : 'días'}`;
+    return `about ${diffInDays} ${diffInDays === 1 ? 'day' : 'days'}`;
   };
 
   return (
     <div className="w-full">
-      {/* Contador de comentarios */}
+      {/* Comment counter */}
       <div className="flex items-center mb-4 text-zinc-400">
         <MessageCircle size={18} className="mr-2" />
-        <span>{comments.length} {comments.length === 1 ? 'comentario' : 'comentarios'}</span>
+        <span>{comments.length} {comments.length === 1 ? 'comment' : 'comments'}</span>
       </div>
       
-      {/* Estado de carga */}
+      {/* Loading state */}
       {isLoading && (
         <div className="text-center py-4">
           <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
-          <p className="mt-2 text-zinc-400">Cargando comentarios...</p>
+          <p className="mt-2 text-zinc-400">Loading comments...</p>
         </div>
       )}
       
-      {/* Mensaje de error */}
+      {/* Error message */}
       {error && !isLoading && (
         <div className="bg-red-900/30 border border-red-700 p-4 rounded-md text-center mb-4">
           <p className="text-red-300">{error}</p>
@@ -69,16 +69,16 @@ const Comment = ({ post_id }) => {
             onClick={fetchComments}
             className="mt-2 text-blue-400 hover:underline"
           >
-            Intentar de nuevo
+            Try again
           </button>
         </div>
       )}
 
-      {/* Lista de comentarios */}
+      {/* No comments message */}
       {!isLoading && !error && comments.length === 0 && (
         <div className="text-center py-6 border border-dashed border-zinc-700 rounded-lg">
           <MessageCircle size={24} className="mx-auto text-zinc-500 mb-2" />
-          <p className="text-zinc-400">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+          <p className="text-zinc-400">No comments yet. Be the first to comment!</p>
         </div>
       )}
 
@@ -91,7 +91,7 @@ const Comment = ({ post_id }) => {
             <div className="flex items-start">
               <img 
                 src={comment.user?.avatar || "/api/placeholder/40/40"} 
-                alt={`Avatar de ${comment.user?.name || 'Usuario'}`} 
+                alt={`Avatar of ${comment.user?.name || 'User'}`} 
                 className="w-10 h-10 rounded-full mr-3 flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
@@ -106,7 +106,7 @@ const Comment = ({ post_id }) => {
                 </div>
                 <p className="text-zinc-300 break-words whitespace-pre-wrap">{comment.text}</p>
                 
-                {/* Acciones del comentario */}
+                {/* Comment actions */}
                 <div className="flex items-center mt-3 text-zinc-500 text-sm">
                   <button className="flex items-center hover:text-blue-400 transition mr-4">
                     <ThumbsUp size={14} className="mr-1" />
@@ -117,7 +117,7 @@ const Comment = ({ post_id }) => {
                     <span>{comment.dislikes || 0}</span>
                   </button>
                   <button className="hover:text-zinc-300 transition">
-                    Responder
+                    Reply
                   </button>
                 </div>
               </div>

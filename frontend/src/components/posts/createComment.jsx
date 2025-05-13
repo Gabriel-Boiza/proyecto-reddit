@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Image } from 'lucide-react';
 import axios from 'axios';
 import { domain } from '../../context/domain';
 
-const CommentForm = ({post_id}) => {
+const CommentForm = ({ post_id }) => {
   const [comment, setComment] = useState('');
   const [notification, setNotification] = useState({ message: '', type: '' });
   const textareaRef = useRef(null);
@@ -13,8 +12,8 @@ const CommentForm = ({post_id}) => {
     try {
       const response = await axios.post(
         `${domain}createComment`, 
-        {post_id: post_id, comment: comment}, 
-        {withCredentials: true}
+        { post_id: post_id, comment: comment }, 
+        { withCredentials: true }
       );
       
       setComment('');
@@ -24,7 +23,7 @@ const CommentForm = ({post_id}) => {
         textareaRef.current.style.height = 'auto';
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Error al enviar el comentario';
+      const errorMessage = error.response?.data?.message || 'Error submitting the comment';
       setNotification({ message: errorMessage, type: 'error' });
     }
   };
@@ -76,7 +75,7 @@ const CommentForm = ({post_id}) => {
               ref={textareaRef}
               value={comment}
               onChange={handleTextareaChange}
-              placeholder="Añade un comentario..."
+              placeholder="Add a comment..."
               className="w-full rounded p-3 text-gray-200 min-h-[40px] resize-none focus:outline-none"
               style={{
                 overflow: comment.length > 100 ? 'auto' : 'hidden'
