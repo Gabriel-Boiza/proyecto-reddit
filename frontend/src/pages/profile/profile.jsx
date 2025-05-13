@@ -13,29 +13,61 @@ import ProfileCard from "../../components/profile/profileCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { domain } from "../../context/domain";
-import { Plus, ThumbsUp, ThumbsDown, Trash } from "lucide-react";
-import { Tab } from "@headlessui/react";
-import { Link } from "react-router-dom";
 import Swal from 'sweetalert2';
 import { useAuth } from '../../context/authContext.js';
+import { useParams } from "react-router-dom";
+import { Tab } from "@headlessui/react";
 
-function Profile({ post, onDelete }) {
-
-    const [user, setUser] = useState({
-        username: "",
-        name: "",
-        age: 0,
-        postCount: 0,
-        commentCount: 0,
-        upvotes: 0,
-        downvotes: 0
-    }); 
+function Profile() {
+    const { userId } = useParams();    
     const { logout } = useAuth();
+
+    const [user, setUser] = useState({});
+    const [authUser, setAuthUser] = useState(null);
+    const [isOwnProfile, setIsOwnProfile] = useState(false);
+
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
     const [upvotedPosts, setUpvotedPosts] = useState([]);
     const [downvotedPosts, setDownvotedPosts] = useState([]);
+
+    // Obtener usuario autenticado para comparar
+    const fetchAuthUser = async () => {
+        try {
+            const res = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
+            setAuthUser(res.data.user);  // Este usuario debe tener el campo _id
+        } catch (error) {
+            console.error("Error getting logged in user:", error.response?.data?.message);
+        }
+    };
     
+    
+
+    const fetchUserData = async (targetUserId) => {
+        const endpoint = targetUserId
+            ? `${domain}getUserProfileById/${targetUserId}`
+            : `${domain}getUserByCookie`;
+    
+        const res = await axios.get(endpoint, { withCredentials: true });
+        
+        // Devuelve todos los datos (user, posts, likes, comments, etc.)
+        return res.data;
+    };
+    
+    const fetchUserPosts = async (isOwner, targetUserId) => {
+        try {
+            const endpoint = isOwner
+                ? `${domain}getPostsByCookie`
+                : `${domain}getPostsByUserId/${targetUserId}`;
+
+            const res = await axios.get(endpoint, { withCredentials: true });
+            setPosts(res.data.posts);
+            console.log(endpoint);
+        } catch (error) {
+            console.error("Error fetching posts:", error.response?.data?.message);
+        }
+    };
+
     const fetchUserInteractions = async () => {
         try {
             const response = await axios.get(`${domain}getUserInteractions`, { withCredentials: true });
@@ -46,43 +78,53 @@ function Profile({ post, onDelete }) {
             console.error("Error fetching interactions:", error.response?.data?.message);
         }
     };
-    
+
     useEffect(() => {
-        userData();
-        userPosts();
-        fetchUserInteractions();
-    }, []);
+        console.log("UserId:", userId);  // Verifica si el userId es correcto
     
-
-    const userData = async () => {
-        try {
-            const response = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
-            const providedUser = response.data.user;
-            setUser({
-                username: providedUser.username,
-                name: providedUser.name,
-                age: providedUser.age,
-                postCount: providedUser.postCount,
-                commentCount: providedUser.commentCount,
-                upvotes: providedUser.upvotes,
-                downvotes: providedUser.downvotes
-            });
-        } catch (error) {
-            console.log(error.response?.data?.message);
-        }
-    };
-
-    const userPosts = async () => {
-        try {
-            const response = await axios.get(`${domain}getPostsByCookie`, { withCredentials: true });
-            setPosts(response.data.posts);
-        } catch (error) {
-            console.log("Error loading user posts:", error.response?.data?.message);
-        }
-    };
+        const loadData = async () => {
+            const targetUserId = userId || null;  // Si userId no está disponible, será null
+    
+            const auth = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
+            const authUserData = auth.data.user;
+            console.log("Auth User:", authUserData);  // Verifica si el usuario autenticado es correcto
+            setAuthUser(authUserData);
+    
+            // Obtener los datos del perfil
+            const profileData = await fetchUserData(targetUserId);
+            const profileUser = profileData.user;
+            console.log("Profile User:", profileUser);  // Verifica si el usuario del perfil es correcto
+    
+            // Comprobación si el perfil es el mismo que el usuario autenticado
+            const sameUser = profileUser?._id === authUserData?._id;
+            console.log("Is Same User:", sameUser);  // Verifica la comparación entre los usuarios
+    
+            setIsOwnProfile(sameUser);  // Establece si el perfil es el mismo
+            setUser(profileUser);
+    
+            // Fetch posts dependiendo si es el perfil del usuario autenticado
+            await fetchUserPosts(sameUser, targetUserId);
+    
+            if (sameUser) {
+                await fetchUserInteractions();
+            } else {
+                setComments(profileData.comments || []);
+                setUpvotedPosts(profileData.likedPosts || []);
+                setDownvotedPosts(profileData.dislikedPosts || []);
+            }
+        };
+    
+        loadData();
+    }, [userId]);
+    
+    
+    
+    
+    
+    console.log(userId);
 
     const handleDeletePost = (postId) => {
-        setPosts(posts.filter(post => post._id !== postId)); // Elimina el post del estado
+        setPosts(posts.filter(post => post._id !== postId));
     };
 
     const deleteAccount = async () => {
@@ -97,18 +139,11 @@ function Profile({ post, onDelete }) {
             cancelButtonText: 'Cancel',
             background: '#1c1c1c',
             color: '#ffffff',
-            customClass: {
-                title: 'text-orange-500',
-                content: 'text-gray-300',
-                confirmButton: 'text-white border-none',
-                cancelButton: 'text-white border-none',
-            },
         });
-    
+
         if (result.isConfirmed) {
             try {
                 await axios.delete(`${domain}deleteAccount`, { withCredentials: true });
-    
                 Swal.fire({
                     title: 'Account deleted!',
                     text: 'Your account has been deleted.',
@@ -116,15 +151,9 @@ function Profile({ post, onDelete }) {
                     background: '#1c1c1c',
                     color: '#ffffff',
                     confirmButtonColor: '#FF6600',
-                    customClass: {
-                        title: 'text-orange-500',
-                        content: 'text-gray-300',
-                        confirmButton: 'text-white border-none',
-                    },
                 }).then(() => {
                     logout();
                 });
-    
             } catch (err) {
                 console.error("Error deleting account:", err);
                 Swal.fire('Error', 'There was a problem deleting the account.', 'error');
@@ -138,97 +167,62 @@ function Profile({ post, onDelete }) {
             <Aside />
             <div className="flex">
                 <main className="content grid grid-cols-[5fr_2fr] gap-6 mx-auto p-4 ml-80 w-[100%]">
-                    <section className="flex flex-col w-[100%]">
+                    <section className="flex flex-col w-full">
                         <div className="flex px-12 gap-6">
-                            <img className="w-18 rounded-full" src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png" alt="" />
+                            <img
+                                className="w-18 rounded-full"
+                                src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
+                                alt="profile avatar"
+                            />
                             <div className="flex flex-col gap-1">
                                 <h2 className="text-3xl font-bold text-[#B7CAD4]">{user.username}</h2>
                                 <h2 className="text-lg text-[#8BA2AD]">{user.name}</h2>
                             </div>
                         </div>
 
-                        <Tab.Group className="w-[100%]">
+                        <Tab.Group className="w-full">
                             <Tab.List className="relative flex space-x-4 mt-6 bg-gray-800 p-1 rounded-lg">
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                    
-                                >
-                                    Posts
-                                </Tab>
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                    
-                                >
-                                    Upvoted
-                                </Tab>
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                    
-                                >
-                                    Downvoted
-                                </Tab>
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                    
-                                >
-                                    Comments
-                                </Tab>
+                                {['Posts', 'Upvoted', 'Downvoted', 'Comments'].map((tab) => (
+                                    <Tab
+                                        key={tab}
+                                        className={({ selected }) =>
+                                            `py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none ${
+                                                selected
+                                                    ? 'bg-blue-600 text-white shadow-md'
+                                                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                                            }`
+                                        }
+                                    >
+                                        {tab}
+                                    </Tab>
+                                ))}
                             </Tab.List>
 
                             <Tab.Panels className="mt-4 max-h-[650px] overflow-y-auto pr-2 scrollPosts">
-                                
                                 <Tab.Panel>
-                                    <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <PostList posts={posts} onDelete={handleDeletePost} />
-                                    </div>
+                                    <PostList posts={posts} onDelete={handleDeletePost} />
                                 </Tab.Panel>
 
                                 <Tab.Panel>
-                                    <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <UpvotedPostList upvotedPosts={upvotedPosts} />
-                                    </div>
+                                    <UpvotedPostList upvotedPosts={upvotedPosts} />
                                 </Tab.Panel>
 
                                 <Tab.Panel>
-                                    <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <DownvotedPostList downvotedPosts={downvotedPosts} />
-                                    </div>
+                                    <DownvotedPostList downvotedPosts={downvotedPosts} />
                                 </Tab.Panel>
-                                
+
                                 <Tab.Panel>
                                     <CommentedPostList comments={comments} />
                                 </Tab.Panel>
-
                             </Tab.Panels>
                         </Tab.Group>
                     </section>
 
-                    <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
-                    <ProfileCard 
-                        user={user}
-                        deleteAccount={deleteAccount}
-                    />
-
+                    <article className="p-10 h-[600px] w-[300px] rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
+                        <ProfileCard
+                            user={user}
+                            deleteAccount={deleteAccount}
+                        />
                     </article>
                 </main>
             </div>

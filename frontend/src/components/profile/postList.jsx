@@ -3,8 +3,11 @@ import { Trash, ThumbsUp, ThumbsDown } from "lucide-react";
 import { domain } from "../../context/domain";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useAuth } from "../../context/authContext";
 
 const PostList = ({ posts, onDelete }) => {
+  const { currentUser } = useAuth(); // Obtiene el usuario logueado
+
   const deletePost = async (e, postId) => {
     e.preventDefault();
     e.stopPropagation();
@@ -21,16 +24,16 @@ const PostList = ({ posts, onDelete }) => {
       background: "#1c1c1c",
       color: "#ffffff",
     });
-    
+
     if (result.isConfirmed) {
       try {
         await axios.delete(`${domain}deletePost`, {
           data: { post_id: postId },
           withCredentials: true,
         });
-    
+
         if (onDelete) onDelete(postId);
-    
+
         Swal.fire({
           title: "Deleted!",
           text: "The post has been deleted.",
@@ -43,9 +46,9 @@ const PostList = ({ posts, onDelete }) => {
         console.error("Error deleting post:", err);
         Swal.fire("Error", "There was a problem deleting the post.", "error");
       }
-    }    
+    }
   };
-
+  console.log(posts)
   return (
     <>
       {posts.length > 0 ? (
@@ -56,15 +59,21 @@ const PostList = ({ posts, onDelete }) => {
               className="block rounded-md p-4 hover:bg-gray-800 w-[100%] flex flex-col justify-between"
             >
               <div className="relative rounded-md p-4 hover:bg-gray-800">
-                <button
-                  onClick={(e) => deletePost(e, post._id)}
-                  className="absolute right-4 top-4 gap-2 bg-[#2a3236] hover:bg-[#333D42] text-white font-bold px-2 py-2 rounded-2xl z-10"
-                  aria-label="Delete Post"
-                >
-                  <Trash className="w-4 h-4" color="red" />
-                </button>
+                {currentUser?.username === post.author?.username && (
+                  <button
+                    onClick={(e) => deletePost(e, post._id)}
+                    className="absolute right-4 top-4 gap-2 bg-[#2a3236] hover:bg-[#333D42] text-white font-bold px-2 py-2 rounded-2xl z-10"
+                    aria-label="Delete Post"
+                  >
+                    <Trash className="w-4 h-4" color="red" />
+                  </button>
+                )}
                 <img
-                  src={`${domain}uploads/${post.file_url}` || "https://via.placeholder.com/150"}
+                  src={
+                    post.file_url
+                      ? `${domain}uploads/${post.file_url}`
+                      : "https://via.placeholder.com/150"
+                  }
                   alt={post.title}
                   className="w-18 h-18 rounded-md mb-2 float-left mr-2"
                 />
