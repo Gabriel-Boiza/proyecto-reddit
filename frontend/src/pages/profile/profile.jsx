@@ -1,11 +1,8 @@
 import Header from "../../layouts/header";
 import Aside from "../../layouts/aside";
 
-// Posts map
+// Posts
 import PostList from "../../components/profile/postList";
-import UpvotedPostList from "../../components/profile/upvotedPostList";
-import DownvotedPostList from "../../components/profile/downvotedPostList";
-import CommentedPostList from "../../components/profile/commentedPostList";
 
 // Card perfil
 import ProfileCard from "../../components/profile/profileCard";
@@ -18,51 +15,44 @@ import { useAuth } from '../../context/authContext.js';
 import { useParams } from "react-router-dom";
 import { Tab } from "@headlessui/react";
 
+// Pestañas solo para el perfil propio
+import UpvotedPostList from "../../components/profile/upvotedPostList";
+import DownvotedPostList from "../../components/profile/downvotedPostList";
+import CommentedPostList from "../../components/profile/commentedPostList";
+
 function Profile() {
-    const { userId } = useParams();    
+    const { userId } = useParams();
     const { logout } = useAuth();
 
     const [user, setUser] = useState({});
-    const [authUser, setAuthUser] = useState(null);
     const [isOwnProfile, setIsOwnProfile] = useState(false);
-
     const [posts, setPosts] = useState([]);
+    const [postsThird, setPostsThird] = useState([]); // Nueva variable para posts del usuario ajeno
+
+    // Solo para perfil propio
     const [comments, setComments] = useState([]);
     const [upvotedPosts, setUpvotedPosts] = useState([]);
     const [downvotedPosts, setDownvotedPosts] = useState([]);
-
-    // Obtener usuario autenticado para comparar
-    const fetchAuthUser = async () => {
-        try {
-            const res = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
-            setAuthUser(res.data.user);  // Este usuario debe tener el campo _id
-        } catch (error) {
-            console.error("Error getting logged in user:", error.response?.data?.message);
-        }
-    };
-    
-    
 
     const fetchUserData = async (targetUserId) => {
         const endpoint = targetUserId
             ? `${domain}getUserProfileById/${targetUserId}`
             : `${domain}getUserByCookie`;
-    
         const res = await axios.get(endpoint, { withCredentials: true });
-        
-        // Devuelve todos los datos (user, posts, likes, comments, etc.)
         return res.data;
     };
-    
+
     const fetchUserPosts = async (isOwner, targetUserId) => {
         try {
             const endpoint = isOwner
                 ? `${domain}getPostsByCookie`
                 : `${domain}getPostsByUserId/${targetUserId}`;
-
             const res = await axios.get(endpoint, { withCredentials: true });
-            setPosts(res.data.posts);
-            console.log(endpoint);
+            if (isOwner) {
+                setPosts(res.data.posts);  // Posts del perfil propio
+            } else {
+                setPostsThird(res.data.posts);  // Posts del perfil ajeno
+            }
         } catch (error) {
             console.error("Error fetching posts:", error.response?.data?.message);
         }
@@ -80,48 +70,51 @@ function Profile() {
     };
 
     useEffect(() => {
-        console.log("UserId:", userId);  // Verifica si el userId es correcto
-    
         const loadData = async () => {
-            const targetUserId = userId || null;  // Si userId no está disponible, será null
-    
-            const auth = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
-            const authUserData = auth.data.user;
-            console.log("Auth User:", authUserData);  // Verifica si el usuario autenticado es correcto
-            setAuthUser(authUserData);
-    
-            // Obtener los datos del perfil
-            const profileData = await fetchUserData(targetUserId);
-            const profileUser = profileData.user;
-            console.log("Profile User:", profileUser);  // Verifica si el usuario del perfil es correcto
-    
-            // Comprobación si el perfil es el mismo que el usuario autenticado
-            const sameUser = profileUser?._id === authUserData?._id;
-            console.log("Is Same User:", sameUser);  // Verifica la comparación entre los usuarios
-    
-            setIsOwnProfile(sameUser);  // Establece si el perfil es el mismo
-            setUser(profileUser);
-    
-            // Fetch posts dependiendo si es el perfil del usuario autenticado
-            await fetchUserPosts(sameUser, targetUserId);
-    
-            if (sameUser) {
-                await fetchUserInteractions();
-            } else {
-                setComments(profileData.comments || []);
-                setUpvotedPosts(profileData.likedPosts || []);
-                setDownvotedPosts(profileData.dislikedPosts || []);
+            try {
+                // Obtener usuario autenticado (cookie)
+                const auth = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
+                const authUserData = auth.data.user;
+
+                let profileUser = null;
+
+                if (userId) {
+                    // Perfil ajeno
+                    const profileData = await fetchUserData(userId);
+                    profileUser = profileData.user;
+                } else {
+                    // Perfil propio
+                    profileUser = authUserData;
+                }
+
+                if (!profileUser) {
+                    throw new Error("No se pudo obtener la información del perfil.");
+                }
+
+                const sameUser = profileUser._id === authUserData._id;
+                setIsOwnProfile(sameUser); // Establece si es tu perfil o el ajeno
+                setUser(profileUser); // Establece los datos del perfil en el estado
+
+                await fetchUserPosts(sameUser, userId);
+
+                if (sameUser) {
+                    await fetchUserInteractions();
+                }
+            } catch (error) {
+                console.error("Error cargando datos del perfil:", error.message);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo cargar el perfil del usuario.',
+                    icon: 'error',
+                    background: '#1c1c1c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#FF6600',
+                });
             }
         };
-    
+
         loadData();
     }, [userId]);
-    
-    
-    
-    
-    
-    console.log(userId);
 
     const handleDeletePost = (postId) => {
         setPosts(posts.filter(post => post._id !== postId));
@@ -168,21 +161,37 @@ function Profile() {
             <div className="flex">
                 <main className="content grid grid-cols-[5fr_2fr] gap-6 mx-auto p-4 ml-80 w-[100%]">
                     <section className="flex flex-col w-full">
-                        <div className="flex px-12 gap-6">
-                            <img
-                                className="w-18 rounded-full"
-                                src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
-                                alt="profile avatar"
-                            />
-                            <div className="flex flex-col gap-1">
-                                <h2 className="text-3xl font-bold text-[#B7CAD4]">{user.username}</h2>
-                                <h2 className="text-lg text-[#8BA2AD]">{user.name}</h2>
+                        {/* Mostrar solo la información del perfil propio */}
+                        {isOwnProfile && (
+                            <div className="flex px-12 gap-6">
+                                <img
+                                    className="w-18 rounded-full"
+                                    src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
+                                    alt="profile avatar"
+                                />
+                                <div className="flex flex-col gap-1">
+                                    <h2 className="text-3xl font-bold text-[#B7CAD4]">{user.username}</h2>
+                                    <h2 className="text-lg text-[#8BA2AD]">{user.name}</h2>
+                                </div>
                             </div>
-                        </div>
+                        )}
 
+                        {/* Pestañas solo para el perfil propio */}
                         <Tab.Group className="w-full">
                             <Tab.List className="relative flex space-x-4 mt-6 bg-gray-800 p-1 rounded-lg">
-                                {['Posts', 'Upvoted', 'Downvoted', 'Comments'].map((tab) => (
+                                <Tab
+                                    className={({ selected }) =>
+                                        `py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none ${
+                                            selected
+                                                ? 'bg-blue-600 text-white shadow-md'
+                                                : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                                        }`
+                                    }
+                                >
+                                    Posts
+                                </Tab>
+
+                                {!userId && ['Upvoted', 'Downvoted', 'Comments'].map((tab) => (
                                     <Tab
                                         key={tab}
                                         className={({ selected }) =>
@@ -200,30 +209,38 @@ function Profile() {
 
                             <Tab.Panels className="mt-4 max-h-[650px] overflow-y-auto pr-2 scrollPosts">
                                 <Tab.Panel>
-                                    <PostList posts={posts} onDelete={handleDeletePost} />
+                                    <PostList 
+                                        posts={userId ? postsThird : posts} // Aquí elegimos los posts según si estamos viendo un perfil ajeno
+                                        onDelete={!userId ? handleDeletePost : undefined} 
+                                    />
                                 </Tab.Panel>
 
-                                <Tab.Panel>
-                                    <UpvotedPostList upvotedPosts={upvotedPosts} />
-                                </Tab.Panel>
-
-                                <Tab.Panel>
-                                    <DownvotedPostList downvotedPosts={downvotedPosts} />
-                                </Tab.Panel>
-
-                                <Tab.Panel>
-                                    <CommentedPostList comments={comments} />
-                                </Tab.Panel>
+                                {!userId && (
+                                    <>
+                                        <Tab.Panel>
+                                            <UpvotedPostList upvotedPosts={upvotedPosts} />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <DownvotedPostList downvotedPosts={downvotedPosts} />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <CommentedPostList comments={comments} />
+                                        </Tab.Panel>
+                                    </>
+                                )}
                             </Tab.Panels>
                         </Tab.Group>
                     </section>
 
                     <article className="p-10 h-[600px] w-[300px] rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
-                        <ProfileCard
-                            user={user}
-                            deleteAccount={deleteAccount}
-                        />
+                        {userId === user.username && (
+                            <ProfileCard user={user} deleteAccount={deleteAccount} isOwnProfile={true} />
+                        )}
+                        {userId !== user.username && (
+                            <ProfileCard user={user} deleteAccount={deleteAccount} isOwnProfile={false} />
+                        )}
                     </article>
+
                 </main>
             </div>
         </>

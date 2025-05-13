@@ -56,57 +56,46 @@ export const getUserByCookie = async (req, res) => {
 
 export const getUserProfileById = async (req, res) => {
     try {
-        const { id } = req.params;
-        // Buscar al usuario en la base de datos por ID (sin contraseña)
-        const user = await User.findById(id).select("-password");
-        if (!user) {
-            return res.status(404).json({ message: "User not found." });
-        }
+        const userId = req.params.id;
 
-        // Posts creados por el usuario
-        const userPosts = await Post.find({ user_id: id });
+        // Obtener datos básicos del usuario
+        const user = await User.findById(userId).select("-password");
+        if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
-        // Todos los posts (para buscar likes/dislikes del usuario)
-        const allPosts = await Post.find();
+        // Obtener los posts del usuario
+        const posts = await Post.find({ user_id: userId }).populate('votes.upvotes votes.downvotes comments.user');
 
-        // Likes y dislikes hechos por el usuario
-        const likedPosts = allPosts.filter(post =>
-            post.votes?.upvotes?.includes(id)
-        );
-        const dislikedPosts = allPosts.filter(post =>
-            post.votes?.downvotes?.includes(id)
-        );
+        // Sumar upvotes y downvotes de los posts
+        const upvotes = posts.reduce((acc, post) => acc + (post.votes?.upvotes?.length || 0), 0);
+        const downvotes = posts.reduce((acc, post) => acc + (post.votes?.downvotes?.length || 0), 0);
 
-        // Comentarios hechos por el usuario
-        const comments = await Comment.find({ user_id: id });
+        // Contar los comentarios de los posts
+        const commentCount = posts.reduce((acc, post) => acc + (post.comments?.length || 0), 0);
 
-        // Sumar upvotes y downvotes en sus propios posts
-        const upvotes = userPosts.reduce((acc, post) => acc + (post.votes?.upvotes?.length || 0), 0);
-        const downvotes = userPosts.reduce((acc, post) => acc + (post.votes?.downvotes?.length || 0), 0);
-
-        res.status(200).json({
+        // Devolver los datos del usuario y sus posts
+        res.json({
             user: {
                 id: user._id,
                 username: user.username,
                 name: user.name,
                 age: user.age,
-                postCount: userPosts.length,
-                commentCount: comments.length,
+                postCount: posts.length,
+                commentCount,
                 upvotes,
-                downvotes
-            },
-            posts: userPosts,
-            likedPosts,
-            dislikedPosts,
-            comments
+                downvotes,
+                posts // Devolvemos los posts aquí
+            }
         });
-        
 
-    } catch (err) {
-        console.error("Error fetching user profile:", err);
-        res.status(500).json({ message: "Server error" });
+    } catch (error) {
+        console.error('Error getUserProfileById:', error);
+        res.status(500).json({ error: 'Error del servidor' });
     }
 };
+
+
+
+
 
 export const getUserInteractions = async (req, res) => {
     try {
