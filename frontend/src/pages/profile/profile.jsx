@@ -17,6 +17,7 @@ import { Plus, ThumbsUp, ThumbsDown, Trash } from "lucide-react";
 import { Tab } from "@headlessui/react";
 import { Link } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { useAuth } from '../../context/authContext.js';
 
 function Profile({ post, onDelete }) {
 
@@ -28,10 +29,9 @@ function Profile({ post, onDelete }) {
         commentCount: 0,
         upvotes: 0,
         downvotes: 0
-    });
-
+    }); 
+    const { logout } = useAuth();
     const [posts, setPosts] = useState([]);
-    const [copied, setCopied] = useState(false);
     const [comments, setComments] = useState([]);
     const [upvotedPosts, setUpvotedPosts] = useState([]);
     const [downvotedPosts, setDownvotedPosts] = useState([]);
@@ -82,10 +82,55 @@ function Profile({ post, onDelete }) {
     };
 
     const handleDeletePost = (postId) => {
-        setPosts(posts.filter(post => post._id !== postId));
+        setPosts(posts.filter(post => post._id !== postId)); // Elimina el post del estado
     };
 
+    const deleteAccount = async () => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "Your account will be permanently deleted!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#FF6600',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete account',
+            cancelButtonText: 'Cancel',
+            background: '#1c1c1c',
+            color: '#ffffff',
+            customClass: {
+                title: 'text-orange-500',
+                content: 'text-gray-300',
+                confirmButton: 'text-white border-none',
+                cancelButton: 'text-white border-none',
+            },
+        });
     
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`${domain}deleteAccount`, { withCredentials: true });
+    
+                Swal.fire({
+                    title: 'Account deleted!',
+                    text: 'Your account has been deleted.',
+                    icon: 'success',
+                    background: '#1c1c1c',
+                    color: '#ffffff',
+                    confirmButtonColor: '#FF6600',
+                    customClass: {
+                        title: 'text-orange-500',
+                        content: 'text-gray-300',
+                        confirmButton: 'text-white border-none',
+                    },
+                }).then(() => {
+                    logout();
+                });
+    
+            } catch (err) {
+                console.error("Error deleting account:", err);
+                Swal.fire('Error', 'There was a problem deleting the account.', 'error');
+            }
+        }
+    };
 
     return (
         <>
@@ -179,17 +224,14 @@ function Profile({ post, onDelete }) {
                     </section>
 
                     <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
-                        <ProfileCard user={user} />
+                    <ProfileCard 
+                        user={user}
+                        deleteAccount={deleteAccount}
+                    />
+
                     </article>
                 </main>
             </div>
-
-            {/* Popup de éxito al copiar */}
-            {copied && (
-                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
-                    <p className="text-sm">Profile link copied to clipboard!</p>
-                </div>
-            )}
         </>
     );
 }

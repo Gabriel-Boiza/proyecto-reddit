@@ -2,10 +2,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from "react";
 import { useAuth } from '../../context/authContext.js';
 import { Plus } from "lucide-react";
-import Swal from 'sweetalert2';
 
-function ProfileCard({ user }) {
+function ProfileCard({ user, deleteAccount }) {
+    const [copied, setCopied] = useState(false);
 
+    // Función para copiar al portapapeles
     const copyToClipboard = () => {
         const profileLink = `${window.location.origin}/profile/${user.username}`; // Suponiendo que la URL del perfil sea esta
         navigator.clipboard.writeText(profileLink)
@@ -17,55 +18,7 @@ function ProfileCard({ user }) {
                 console.error("Error copying to clipboard:", error);
             });
     };
-
-    const deleteAccount = async () => {
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: "Your account will be permanently deleted!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#FF6600',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete account',
-            cancelButtonText: 'Cancel',
-            background: '#1c1c1c',
-            color: '#ffffff',
-            customClass: {
-                title: 'text-orange-500',
-                content: 'text-gray-300',
-                confirmButton: 'text-white border-none',
-                cancelButton: 'text-white border-none',
-            },
-        });
     
-        if (result.isConfirmed) {
-            try {
-                await axios.delete(`${domain}deleteAccount`, { withCredentials: true });
-    
-                // You can redirect the user or show a success message here
-                Swal.fire({
-                    title: 'Account deleted!',
-                    text: 'Your account has been deleted.',
-                    icon: 'success',
-                    background: '#1c1c1c',
-                    color: '#ffffff',
-                    confirmButtonColor: '#FF6600',
-                    customClass: {
-                        title: 'text-orange-500',
-                        content: 'text-gray-300',
-                        confirmButton: 'text-white border-none',
-                    },
-                }).then(() => {
-                    window.location.href = '/';  // Redirect to home or main page
-                });
-    
-            } catch (err) {
-                console.error("Error deleting account:", err);
-                Swal.fire('Error', 'There was a problem deleting the account.', 'error');
-            }
-        }
-    };
-
     return (
       <>
       <div className="flex justify-between items-center mb-4">
@@ -101,7 +54,7 @@ function ProfileCard({ user }) {
                                       <img className="w-8 rounded-full" src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png" alt="" />
                                       <div>
                                           <p className="text-white text-sm">Profile</p>
-                                          <Link to="/editProfile" className="text-xs">
+                                          <Link to="/editProfile" className="text-xs hover:underline">
                                               Customize your profile
                                           </Link>
                                       </div>
@@ -151,6 +104,12 @@ function ProfileCard({ user }) {
                                   </div>
                               </div>
                           </div>
+                          {/* Popup de éxito al copiar */}
+            {copied && (
+                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+                    <p className="text-sm">Profile link copied to clipboard!</p>
+                </div>
+            )}
                           </>
     );
   }
