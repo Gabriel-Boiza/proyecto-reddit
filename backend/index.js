@@ -7,6 +7,7 @@ import usersRouter from "./routes/user.route.js"
 import postsRouter from "./routes/post.route.js"
 import authRouter from "./routes/auth.routes.js"
 import commentRouter from "./routes/comment.routes.js"  
+import searchRouter from "./routes/search.route.js"
 
 dotenv.config()
 connectDB()
@@ -30,6 +31,7 @@ app.use("/", usersRouter)
 app.use("/", postsRouter)
 app.use("/", authRouter)
 app.use("/", commentRouter)
+app.use("/", searchRouter)
 
 
 const PORT = process.env.PORT || 3000
