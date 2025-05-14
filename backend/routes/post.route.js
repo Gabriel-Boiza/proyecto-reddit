@@ -8,6 +8,7 @@ const route = express.Router()
 route.get("/getAllPosts", PostController.getAllPosts)
 route.get("/getPostsByCookie", authMiddleware.verifyToken, PostController.getPostsByCookie)
 route.get("/getPostById/:id", PostController.getPostById)
+route.get("/getPostsByUsername/:username", PostController.getPostsByUsername)
 
 route.post("/upvote", authMiddleware.verifyToken, PostController.upVote)
 route.post("/downvote", authMiddleware.verifyToken, PostController.downVote)

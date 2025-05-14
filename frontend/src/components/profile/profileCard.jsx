@@ -3,8 +3,12 @@ import { useState } from "react";
 import { useAuth } from '../../context/authContext.js';
 import { Plus } from "lucide-react";
 
+<<<<<<< HEAD
 function ProfileCard({ user, deleteAccount, isOwnProfile }) {
     const [copied, setCopied] = useState(false);
+=======
+function ProfileCard({ user, isOwner }) {
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
 
     // Función para copiar al portapapeles
     const copyToClipboard = () => {
@@ -107,6 +111,7 @@ function ProfileCard({ user, deleteAccount, isOwnProfile }) {
                                   Delete account
                               </button>
                           </div>
+<<<<<<< HEAD
                       </div>
                   </div>
               </>
@@ -119,6 +124,55 @@ function ProfileCard({ user, deleteAccount, isOwnProfile }) {
               </div>
           )}
       </>
+=======
+                          <hr className="border-gray-700 my-4 mx-2" />
+  
+                          <div>
+                              <h3 className="text-xs font-bold text-gray-400 mb-2">MEDIA</h3>
+                              <div className="flex justify-between items-center">
+                                  <div className="flex items-center gap-2">
+                                      <div>
+                                          <button className="flex bg-gray-700 text-white text-xs rounded-full px-3 w-34 py-1">
+                                              <Plus className="w-4 h-4 mr-2" />Add Social Link
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <hr className="border-gray-700 my-4 mx-2" />
+  
+                          <div>
+                              <h3 className="text-xs font-bold text-gray-400 mb-2">SHARE MY PROFILE</h3>
+                              <div className="flex justify-between items-center">
+                                  <div className="flex items-center gap-2">
+                                      <div>
+                                          <button onClick={copyToClipboard} className="flex bg-gray-700 text-white text-xs rounded-full px-3 w-34 py-1">
+                                              Copy to Clipboard
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          {isOwner && (
+                            <div>
+                                <hr className="border-gray-700 my-4 mx-2" />
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-400 mb-2">DELETE ACCOUNT</h3>
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <button 
+                                                onClick={deleteAccount} 
+                                                className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md w-full"
+                                            >
+                                                Delete account
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                          )}
+                          </>
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
     );
 }
 

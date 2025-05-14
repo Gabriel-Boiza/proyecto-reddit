@@ -7,9 +7,16 @@ const route = express.Router()
 
 route.get("/getAllUsers", UserController.getAllUsers)
 route.get("/getUserById/:id", UserController.getUserById)
+route.get("/getUserByUsername/:username", UserController.getUserByUsername)
 route.get("/getUserByCookie", auth.verifyToken, UserController.getUserByCookie)
+<<<<<<< HEAD
 route.get("/getUserProfileById/:id", auth.verifyToken, UserController.getUserProfileById);
 route.get('/getUserInteractions', auth.verifyToken, UserController.getUserInteractions);
+=======
+
+route.get("/getUserInteractions", auth.verifyToken, UserController.getUserInteractions);
+route.get("/getUserInteractionsByUsername/:username", UserController.getUserInterectionsByUsername);
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
 
 
 route.put('/editUser', auth.verifyToken, UserController.editUser);

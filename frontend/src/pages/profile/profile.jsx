@@ -6,15 +6,21 @@ import PostList from "../../components/profile/postList";
 
 // Card perfil
 import ProfileCard from "../../components/profile/profileCard";
-
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { domain } from "../../context/domain";
+<<<<<<< HEAD
+=======
+import { Plus, ThumbsUp, ThumbsDown, Trash } from "lucide-react";
+import { Tab } from "@headlessui/react";
+import { Link, useParams } from "react-router-dom";
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
 import Swal from 'sweetalert2';
 import { useAuth } from '../../context/authContext.js';
 import { useParams } from "react-router-dom";
 import { Tab } from "@headlessui/react";
 
+<<<<<<< HEAD
 // Pestañas solo para el perfil propio
 import UpvotedPostList from "../../components/profile/upvotedPostList";
 import DownvotedPostList from "../../components/profile/downvotedPostList";
@@ -26,6 +32,21 @@ function Profile() {
 
     const [user, setUser] = useState({});
     const [isOwnProfile, setIsOwnProfile] = useState(false);
+=======
+function Profile({isOwner}) {
+    const [user, setUser] = useState({
+        username: "",
+        name: "",
+        age: 0,
+        postCount: 0,
+        commentCount: 0,
+        upvotes: 0,
+        downvotes: 0
+    });
+
+    const {username} = useParams()
+
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
     const [posts, setPosts] = useState([]);
     const [postsThird, setPostsThird] = useState([]); // Nueva variable para posts del usuario ajeno
 
@@ -60,7 +81,13 @@ function Profile() {
 
     const fetchUserInteractions = async () => {
         try {
-            const response = await axios.get(`${domain}getUserInteractions`, { withCredentials: true });
+            let response
+            if(isOwner){
+                response = await axios.get(`${domain}getUserInteractions`, { withCredentials: true });
+            }
+            else{
+                response = await axios.get(`${domain}getUserInteractionsByUsername/${username}`, { withCredentials: true });
+            }
             setComments(response.data.commentsWithPosts || []);
             setUpvotedPosts(response.data.upvotedPosts || []);
             setDownvotedPosts(response.data.downvotedPosts || []);
@@ -76,6 +103,7 @@ function Profile() {
                 const auth = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
                 const authUserData = auth.data.user;
 
+<<<<<<< HEAD
                 let profileUser = null;
 
                 if (userId) {
@@ -115,6 +143,47 @@ function Profile() {
 
         loadData();
     }, [userId]);
+=======
+    const userData = async () => {
+        let response;
+        try {
+            if (isOwner) {
+                response = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
+            } else {
+                response = await axios.get(`${domain}getUserByUsername/${username}`, { withCredentials: true });
+            }
+    
+            const providedUser = response.data.user;
+            setUser({
+                username: providedUser.username,
+                name: providedUser.name,
+                age: providedUser.age,
+                postCount: providedUser.postCount,
+                commentCount: providedUser.commentCount,
+                upvotes: providedUser.upvotes,
+                downvotes: providedUser.downvotes
+            });
+        } catch (error) {
+            console.log(error.response?.data?.message);
+        }
+    };
+    
+
+    const userPosts = async () => {
+        let response
+        try {
+            if(isOwner){
+                response = await axios.get(`${domain}getPostsByCookie`, { withCredentials: true });
+            }
+            else{
+                response = await axios.get(`${domain}getPostsByUsername/${username}`, { withCredentials: true });
+            }
+            setPosts(response.data.posts);
+        } catch (error) {
+            console.log("Error loading user posts:", error.response?.data?.message);
+        }
+    };
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
 
     const handleDeletePost = (postId) => {
         setPosts(posts.filter(post => post._id !== postId));
@@ -209,10 +278,32 @@ function Profile() {
 
                             <Tab.Panels className="mt-4 max-h-[650px] overflow-y-auto pr-2 scrollPosts">
                                 <Tab.Panel>
+<<<<<<< HEAD
                                     <PostList 
                                         posts={userId ? postsThird : posts} // Aquí elegimos los posts según si estamos viendo un perfil ajeno
                                         onDelete={!userId ? handleDeletePost : undefined} 
                                     />
+=======
+                                    <div className="max-h-[600px] overflow-y-auto pr-2">
+                                        <PostList posts={posts} onDelete={handleDeletePost} isOwner={isOwner} />
+                                    </div>
+                                </Tab.Panel>
+
+                                <Tab.Panel>
+                                    <div className="max-h-[600px] overflow-y-auto pr-2">
+                                        <UpvotedPostList upvotedPosts={upvotedPosts} />
+                                    </div>
+                                </Tab.Panel>
+
+                                <Tab.Panel>
+                                    <div className="max-h-[600px] overflow-y-auto pr-2">
+                                        <DownvotedPostList downvotedPosts={downvotedPosts} />
+                                    </div>
+                                </Tab.Panel>
+                                
+                                <Tab.Panel>
+                                    <CommentedPostList comments={comments} />
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
                                 </Tab.Panel>
 
                                 {!userId && (
@@ -232,6 +323,7 @@ function Profile() {
                         </Tab.Group>
                     </section>
 
+<<<<<<< HEAD
                     <article className="p-10 h-[600px] w-[300px] rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
                         {userId === user.username && (
                             <ProfileCard user={user} deleteAccount={deleteAccount} isOwnProfile={true} />
@@ -243,6 +335,20 @@ function Profile() {
 
                 </main>
             </div>
+=======
+                    <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
+                        <ProfileCard user={user} isOwner={isOwner} />
+                    </article>
+                    
+                </main>
+            </div>
+
+            {copied && (
+                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+                    <p className="text-sm">Profile link copied to clipboard!</p>
+                </div>
+            )}
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
         </>
     );
 }

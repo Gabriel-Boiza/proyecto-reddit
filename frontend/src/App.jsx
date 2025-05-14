@@ -21,12 +21,20 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+<<<<<<< HEAD
           <Route path="/pp/:id" element={<ProfilePrueba />} />
           <Route path='/post/:id' element={<ViewPost/>}/>
           <Route element={<PrivateRoute />}>
             <Route path="/createPost" element={<CreatePost />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:userId" element={<Profile />} />
+=======
+          <Route path="/profile/:username" element={<Profile isOwner={false} />} />
+          <Route path='/post/:id' element={<ViewPost/>}/>
+          <Route element={<PrivateRoute />}>
+            <Route path="/createPost" element={<CreatePost />} />
+            <Route path="/profile" element={<Profile isOwner={true}/>} />
+>>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
             <Route path="/editProfile" element={<EditProfile />} />
           </Route>
         </Routes>
