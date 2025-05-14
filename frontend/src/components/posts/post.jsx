@@ -78,9 +78,11 @@ function Post({ post }) {
       <Card className="bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-colors duration-200 cursor-pointer">
         <CardContent className="p-4">
           <div className="text-sm text-muted-foreground mb-1">
-            <span className="font-medium text-white">
+          <Link to={`/profile/${post.user_id?.username ?? ""}`}>
+            <span className="font-medium text-white hover:underline cursor-pointer">
               {post.user_id?.username ?? "Anon"}
-            </span>{" "}
+            </span>
+          </Link>
             •{" "}
             {new Date(post.created_at).toLocaleString([], {
               day: "2-digit",

@@ -20,11 +20,11 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
+          <Route path="/profile/:username" element={<Profile isOwner={false} />} />
           <Route path='/post/:id' element={<ViewPost/>}/>
           <Route element={<PrivateRoute />}>
             <Route path="/createPost" element={<CreatePost />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<Profile isOwner={true}/>} />
             <Route path="/editProfile" element={<EditProfile />} />
           </Route>
         </Routes>

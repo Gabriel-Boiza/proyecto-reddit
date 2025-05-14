@@ -9,17 +9,15 @@ import CommentedPostList from "../../components/profile/commentedPostList";
 
 // Card perfil
 import ProfileCard from "../../components/profile/profileCard";
-
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { domain } from "../../context/domain";
 import { Plus, ThumbsUp, ThumbsDown, Trash } from "lucide-react";
 import { Tab } from "@headlessui/react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
 
-function Profile({ post, onDelete }) {
-
+function Profile({isOwner}) {
     const [user, setUser] = useState({
         username: "",
         name: "",
@@ -29,6 +27,8 @@ function Profile({ post, onDelete }) {
         upvotes: 0,
         downvotes: 0
     });
+
+    const {username} = useParams()
 
     const [posts, setPosts] = useState([]);
     const [copied, setCopied] = useState(false);
@@ -55,8 +55,14 @@ function Profile({ post, onDelete }) {
     
 
     const userData = async () => {
+        let response;
         try {
-            const response = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
+            if (isOwner) {
+                response = await axios.get(`${domain}getUserByCookie`, { withCredentials: true });
+            } else {
+                response = await axios.get(`${domain}getUserByUsername/${username}`, { withCredentials: true });
+            }
+    
             const providedUser = response.data.user;
             setUser({
                 username: providedUser.username,
@@ -71,6 +77,7 @@ function Profile({ post, onDelete }) {
             console.log(error.response?.data?.message);
         }
     };
+    
 
     const userPosts = async () => {
         try {
@@ -154,7 +161,7 @@ function Profile({ post, onDelete }) {
                                 
                                 <Tab.Panel>
                                     <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <PostList posts={posts} onDelete={handleDeletePost} />
+                                        <PostList posts={posts} onDelete={handleDeletePost} isOwner={isOwner} />
                                     </div>
                                 </Tab.Panel>
 
@@ -178,13 +185,14 @@ function Profile({ post, onDelete }) {
                         </Tab.Group>
                     </section>
 
-                    <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
-                        <ProfileCard user={user} />
-                    </article>
+                    {isOwner && 
+                        <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
+                            <ProfileCard user={user} />
+                        </article>
+                    }
                 </main>
             </div>
 
-            {/* Popup de éxito al copiar */}
             {copied && (
                 <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
                     <p className="text-sm">Profile link copied to clipboard!</p>

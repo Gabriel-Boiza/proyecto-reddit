@@ -4,7 +4,7 @@ import { domain } from "../../context/domain";
 import Swal from "sweetalert2";
 import axios from "axios";
 
-const PostList = ({ posts, onDelete }) => {
+const PostList = ({ posts, onDelete, isOwner }) => {
   const deletePost = async (e, postId) => {
     e.preventDefault();
     e.stopPropagation();
@@ -56,13 +56,15 @@ const PostList = ({ posts, onDelete }) => {
               className="block rounded-md p-4 hover:bg-gray-800 w-[100%] flex flex-col justify-between"
             >
               <div className="relative rounded-md p-4 hover:bg-gray-800">
-                <button
-                  onClick={(e) => deletePost(e, post._id)}
-                  className="absolute right-4 top-4 gap-2 bg-[#2a3236] hover:bg-[#333D42] text-white font-bold px-2 py-2 rounded-2xl z-10"
-                  aria-label="Delete Post"
-                >
-                  <Trash className="w-4 h-4" color="red" />
-                </button>
+                {isOwner && 
+                  <button
+                    onClick={(e) => deletePost(e, post._id)}
+                    className="absolute right-4 top-4 gap-2 bg-[#2a3236] hover:bg-[#333D42] text-white font-bold px-2 py-2 rounded-2xl z-10"
+                    aria-label="Delete Post"
+                  >
+                    <Trash className="w-4 h-4" color="red" />
+                  </button>
+                }
                 <img
                   src={`${domain}uploads/${post.file_url}` || "https://via.placeholder.com/150"}
                   alt={post.title}
