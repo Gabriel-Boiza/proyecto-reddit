@@ -86,8 +86,14 @@ function Profile({isOwner}) {
     
 
     const userPosts = async () => {
+        let response
         try {
-            const response = await axios.get(`${domain}getPostsByCookie`, { withCredentials: true });
+            if(isOwner){
+                response = await axios.get(`${domain}getPostsByCookie`, { withCredentials: true });
+            }
+            else{
+                response = await axios.get(`${domain}getPostsByUsername/${username}`, { withCredentials: true });
+            }
             setPosts(response.data.posts);
         } catch (error) {
             console.log("Error loading user posts:", error.response?.data?.message);

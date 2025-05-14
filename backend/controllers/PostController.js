@@ -43,6 +43,8 @@ export const getPostById = async (req, res) => {
         res.status(500).json({ message: "Error interno al obtener el post." });
     }
 };
+
+
   
 
 export const createPost = [
@@ -167,6 +169,27 @@ export const getPostsByCookie = async (req, res) => {
         console.error("Error al obtener los posts del usuario:", error);
         res.status(500).json({ message: "Error interno del servidor" });
     }
+};
+
+export const getPostsByUsername = async (req, res) => {
+  try {
+      const { username } = req.params;
+
+      // Buscar el usuario por username
+      const user = await User.findOne({ username });
+
+      if (!user) {
+          return res.status(404).json({ message: "Usuario no encontrado." });
+      }
+
+      // Buscar los posts asociados al usuario
+      const posts = await Post.find({ _id: { $in: user.posts } });
+
+      res.status(200).json({ posts: posts });
+  } catch (error) {
+      console.error("Error al obtener los posts del usuario:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
+  }
 };
 
 
