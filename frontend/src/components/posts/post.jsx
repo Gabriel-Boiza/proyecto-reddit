@@ -71,8 +71,7 @@ function Post({ post }) {
 
   return (
     <>
-<<<<<<< HEAD
-    <Link to={`/post/${post._id}`} className="block">
+      <Link to={`/post/${post._id}`} className="block">
       <Card className="bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-colors duration-200 cursor-pointer">
         <CardContent className="p-4">
           <div className="text-sm text-muted-foreground mb-1">
@@ -97,35 +96,6 @@ function Post({ post }) {
               className="rounded-lg border-muted shadow mb-3 w-full object-cover"
             />
           )}
-=======
-      {/* Usamos Link para la navegación */}
-      <Link to={`/post/${post._id}`} className="block">
-        <Card className="bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-colors duration-200 cursor-pointer">
-          <CardContent className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">
-              <Link to={`/profile/${post.user_id?.username ?? ""}`}>
-                <span className="font-medium text-white hover:underline cursor-pointer">
-                  {post.user_id?.username ?? "Anon"}
-                </span>
-              </Link>
-              •{" "}
-              {new Date(post.created_at).toLocaleString([], {
-                day: "2-digit",
-                month: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </div>
-            <h2 className="text-lg font-semibold">{post.title}</h2>
-            <p className="text-sm text-gray-400 mb-3">{post.description}</p>
-            {post?.file_url && (
-              <img
-                src={`${domain}uploads/${post.file_url}`}
-                alt="post"
-                className="rounded-lg border-muted shadow mb-3 w-full object-cover"
-              />
-            )}
->>>>>>> a4d0abba51074c2cf1d28cd37ffd2be11afd764a
 
             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <div className={getVoteContainerClass()}>
