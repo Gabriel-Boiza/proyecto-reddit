@@ -38,7 +38,13 @@ function Profile({isOwner}) {
     
     const fetchUserInteractions = async () => {
         try {
-            const response = await axios.get(`${domain}getUserInteractions`, { withCredentials: true });
+            let response
+            if(isOwner){
+                response = await axios.get(`${domain}getUserInteractions`, { withCredentials: true });
+            }
+            else{
+                response = await axios.get(`${domain}getUserInteractionsByUsername/${username}`, { withCredentials: true });
+            }
             setComments(response.data.commentsWithPosts || []);
             setUpvotedPosts(response.data.upvotedPosts || []);
             setDownvotedPosts(response.data.downvotedPosts || []);
