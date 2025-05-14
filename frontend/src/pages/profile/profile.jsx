@@ -197,11 +197,10 @@ function Profile({isOwner}) {
                         </Tab.Group>
                     </section>
 
-                    {isOwner && 
-                        <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
-                            <ProfileCard user={user} />
-                        </article>
-                    }
+                    <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
+                        <ProfileCard user={user} isOwner={isOwner} />
+                    </article>
+                    
                 </main>
             </div>
 
