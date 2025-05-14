@@ -4,7 +4,7 @@ import { useAuth } from '../../context/authContext.js';
 import { Plus } from "lucide-react";
 import Swal from 'sweetalert2';
 
-function ProfileCard({ user }) {
+function ProfileCard({ user, isOwner }) {
 
     const copyToClipboard = () => {
         const profileLink = `${window.location.origin}/profile/${user.username}`; // Suponiendo que la URL del perfil sea esta
@@ -136,21 +136,24 @@ function ProfileCard({ user }) {
                                   </div>
                               </div>
                           </div>
-                          <hr className="border-gray-700 my-4 mx-2" />
-  
-                          <div>
-                              <h3 className="text-xs font-bold text-gray-400 mb-2">DELETE ACCOUNT</h3>
-                              <div className="flex justify-between items-center">
-                                  <div className="flex items-center gap-2">
-                                      <button 
-                                          onClick={deleteAccount} 
-                                          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md w-full"
-                                      >
-                                          Delete account
-                                      </button>
-                                  </div>
-                              </div>
-                          </div>
+                          {isOwner && (
+                            <div>
+                                <hr className="border-gray-700 my-4 mx-2" />
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-400 mb-2">DELETE ACCOUNT</h3>
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <button 
+                                                onClick={deleteAccount} 
+                                                className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md w-full"
+                                            >
+                                                Delete account
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                          )}
                           </>
     );
   }
