@@ -54,10 +54,10 @@ function SearchBar() {
   }, []);
 
   return (
-    <>
-      <div className="w-full max-w-md flex items-center space-x-2 bg-[#2a3236] hover:bg-[#333D42] rounded-full">
+    <div className="relative w-full max-w-md mx-auto">
+      <div className="flex items-center space-x-2 bg-[#2a3236] hover:bg-[#333D42] rounded-full px-4 py-2">
         <svg
-          className="search-icon w-5 h-5 text-white ml-5"
+          className="search-icon w-5 h-5 text-white"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           width="15"
@@ -68,48 +68,47 @@ function SearchBar() {
         <input
           type="text"
           placeholder="Search reddix"
-          className="header-search-bar text-white bg-transparent focus:outline-none"
+          className="header-search-bar text-white bg-transparent focus:outline-none flex-grow"
           name="searchBar"
           value={query}
           onChange={handleInputChange}
         />
       </div>
-
+  
       {query.trim() !== "" && results.length > 0 && (
         <div
           ref={resultsRef}
-          className="absolute left-131 w-200 top-11 text-white mt-2 rounded-md max-w-md p-2 max-h-[200px] overflow-y-auto pr-2 bg-[#2a3236]"
+          className="absolute left-0 top-full mt-1 w-full max-h-[200px] overflow-y-auto bg-[#2a3236] rounded-md p-2 text-white shadow-lg z-10"
         >
           {results.map((item, index) => (
             <div key={item._id}>
-              {index > 0 && <hr className="mt-2 mb-2 border-[#3c474c]" />}
+              {index > 0 && <hr className="my-2 border-[#3c474c]" />}
               <Link
                 to={`/post/${item._id}`}
-                className="block hover:bg-[#3c474c] p-2 rounded cursor-pointer"
+                className="block hover:bg-[#3c474c] p-2 rounded cursor-pointer flex justify-between"
               >
-                <div className="flex justify-between w-full">
-                  <div>
-                    <span className="text-sm text-gray-400">
-                      {item.created_at
-                      ? format(new Date(item.created_at), "d MMMM yyyy")
+                <div>
+                  <span className="text-sm text-gray-400">
+                    {item.created_at
+                      ? format(new Date(item.created_at), "d MMMM yyyy", { locale: es })
                       : ""}
-                    </span>
-                    <p className="font-semibold">{item.title}</p>
-                    <p className="text-sm text-gray-300">{item.description}</p>
-                  </div>
-                  <img
-                    src={`${domain}uploads/${item.file_url}` || "https://via.placeholder.com/150"}
-                    alt={item.title}
-                    className="w-18 h-18 rounded-md"
-                  />
+                  </span>
+                  <p className="font-semibold">{item.title}</p>
+                  <p className="text-sm text-gray-300">{item.description}</p>
                 </div>
+                <img
+                  src={`${domain}uploads/${item.file_url}` || "https://via.placeholder.com/150"}
+                  alt={item.title}
+                  className="w-18 h-18 rounded-md ml-4"
+                />
               </Link>
             </div>
           ))}
         </div>
       )}
-    </>
+    </div>
   );
+  
 }
 
 export default SearchBar;
