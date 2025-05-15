@@ -27,9 +27,9 @@ function EditProfile() {
     if (imageFile) {
       formData.append('file', imageFile);
     }
-
+    console.log(formData)
     try {
-      const response = await axios.post(`${domain}updateProfile`, formData, {
+      const response = await axios.put(`${domain}updateProfile`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

@@ -27,6 +27,7 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/createPost" element={<CreatePost />} />
             <Route path="/profile" element={<Profile isOwner={true}/>} />
+            <Route path="/editProfile" element={<EditProfile />} />
           </Route>
         </Routes>
       </Router>

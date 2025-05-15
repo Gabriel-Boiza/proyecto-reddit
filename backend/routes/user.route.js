@@ -1,7 +1,7 @@
 import express from "express"
 import * as UserController from "../controllers/UserController.js"
 import * as auth from "../middlewares/auth.middleware.js"
-
+import { upload } from "../config/multer.js"
 
 const route = express.Router()
 
@@ -15,7 +15,7 @@ route.get("/getUserInteractionsByUsername/:username", UserController.getUserInte
 
 
 
-route.put('/editUser', auth.verifyToken, UserController.editUser);
+route.put('/updateProfile', auth.verifyToken, upload.single('file'), UserController.updateProfile);
 
 route.delete("/deleteAccount", auth.verifyToken, UserController.deleteUser)
 

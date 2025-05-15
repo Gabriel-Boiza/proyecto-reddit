@@ -1,8 +1,9 @@
 import User from "../models/User.js"
 import Comment from "../models/Comment.js";
 import Post from "../models/Post.js";
-
+import multer from "multer";
 import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 
 export const getAllUsers = async (req, res) => {
     const users = await User.find();
@@ -42,7 +43,8 @@ export const getUserByUsername = async (req, res) => {
                 postCount: posts.length,
                 commentCount,
                 upvotes,
-                downvotes
+                downvotes,
+                profileImage: user.profileImage
             }
         });
     } catch (error) {
@@ -73,7 +75,8 @@ export const getUserByCookie = async (req, res) => {
                 postCount: posts.length,
                 commentCount,
                 upvotes,
-                downvotes
+                downvotes,
+                profileImage: user.profileImage
             }
         });
     } catch (err) {
@@ -257,3 +260,32 @@ export const getUserComments = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, username, password } = req.body;
+    const user_id = req.user.id;
+    const file = req.file;
+
+    const updateData = {
+      name,
+      username,
+    };
+
+    if (password) {
+      const hashPassword = await bcrypt.hash(password, parseInt(process.env.SALT_HASH));
+      updateData.password = hashPassword;
+    }
+
+    if (file) {
+      updateData.profileImage = file.filename; 
+    }
+
+    const user = await User.findByIdAndUpdate(user_id, updateData, { new: true });
+
+    res.status(200).json({ message: "Perfil actualizado", user });
+  } catch (error) {
+    console.error("Error al actualizar el perfil:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};

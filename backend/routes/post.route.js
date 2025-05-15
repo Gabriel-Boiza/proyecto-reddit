@@ -1,7 +1,7 @@
 import express from "express"
 import * as PostController from "../controllers/PostController.js"
 import * as authMiddleware from '../middlewares/auth.middleware.js'
-
+import { upload } from "../config/multer.js"
 
 const route = express.Router()
 
@@ -15,7 +15,7 @@ route.post("/downvote", authMiddleware.verifyToken, PostController.downVote)
 route.post("/getVoteState", authMiddleware.verifyToken, PostController.getVoteState)
 
 
-route.post("/createPost", authMiddleware.verifyToken , PostController.createPost)
+route.post("/createPost", authMiddleware.verifyToken, upload.single("file"), PostController.createPost)
 route.delete("/deletePost", authMiddleware.verifyToken, PostController.deletePost)
 
 export default route
