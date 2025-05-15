@@ -1,6 +1,7 @@
 import Header from "../../layouts/header";
 import Aside from "../../layouts/aside";
 
+import { useAuth } from "../../context/authContext";
 // Posts map
 import PostList from "../../components/profile/postList";
 import UpvotedPostList from "../../components/profile/upvotedPostList";
@@ -17,6 +18,8 @@ import { Tab } from "@headlessui/react";
 import { Link, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
 
+
+
 function Profile({isOwner}) {
     const [user, setUser] = useState({
         username: "",
@@ -28,6 +31,7 @@ function Profile({isOwner}) {
         downvotes: 0
     });
 
+    const {logout} = useAuth()
     const {username} = useParams()
 
     const [posts, setPosts] = useState([]);
@@ -132,7 +136,8 @@ function Profile({isOwner}) {
                 confirmButtonColor: '#f97316',
               }).then(() => {
                 // Redirige sin librerías
-                window.location.href = '/login';
+                logout()
+                window.location.href = '/';
               });
       
             } catch (error) {
