@@ -7,7 +7,6 @@ import usersRouter from "./routes/user.route.js"
 import postsRouter from "./routes/post.route.js"
 import authRouter from "./routes/auth.routes.js"
 import commentRouter from "./routes/comment.routes.js"  
-import searchRouter from "./routes/search.route.js"
 import searchRouter from "./routes/search.routes.js"  
 
 dotenv.config()
