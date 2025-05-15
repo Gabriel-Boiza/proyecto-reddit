@@ -76,7 +76,7 @@ function Post({ post }) {
         <CardContent className="p-4">
           <div className="text-sm text-muted-foreground mb-1">
             
-            <Link to={`/profile/${post.user_id?._id}`} className="font-medium text-white hover:underline">
+            <Link to={`/profile/${post.user_id?.username}`} className="font-medium text-white hover:underline">
               {post.user_id?.username ?? "Anon"}
             </Link>{" "}
             •{" "}

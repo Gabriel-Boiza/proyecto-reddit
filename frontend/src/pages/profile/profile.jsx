@@ -54,6 +54,7 @@ function Profile({isOwner}) {
     };
     
     useEffect(() => {
+        console.log(username)
         userData();
         userPosts();
         fetchUserInteractions();
@@ -104,7 +105,51 @@ function Profile({isOwner}) {
         setPosts(posts.filter(post => post._id !== postId));
     };
 
-    
+    const deleteAccount = () => {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "This will permanently delete your account!",
+          icon: 'warning',
+          background: '#1e293b', // fondo oscuro
+          color: '#f97316',      // texto naranja
+          showCancelButton: true,
+          confirmButtonColor: '#f97316', // naranja
+          cancelButtonColor: '#374151',  // gris oscuro
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'Cancel',
+          reverseButtons: true,
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              await axios.delete(`${domain}deleteAccount`, { withCredentials: true });
+      
+              Swal.fire({
+                title: 'Deleted!',
+                text: 'Your account has been deleted.',
+                icon: 'success',
+                background: '#1e293b',
+                color: '#f97316',
+                confirmButtonColor: '#f97316',
+              }).then(() => {
+                // Redirige sin librerías
+                window.location.href = '/login';
+              });
+      
+            } catch (error) {
+              Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.message || 'Failed to delete account',
+                icon: 'error',
+                background: '#1e293b',
+                color: '#f97316',
+                confirmButtonColor: '#f97316',
+              });
+            }
+          }
+        });
+      };
+      
+      
 
     return (
         <>
@@ -198,7 +243,7 @@ function Profile({isOwner}) {
                     </section>
 
                     <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
-                        <ProfileCard user={user} isOwner={isOwner} />
+                        <ProfileCard user={user} isOwner={isOwner} deleteAccount={deleteAccount} />
                     </article>
                     
                 </main>
