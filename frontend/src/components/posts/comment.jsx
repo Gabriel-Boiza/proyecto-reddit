@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { domain } from "../../context/domain";
 import { MessageCircle, ThumbsUp, ThumbsDown, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const Comment = ({ post_id }) => {
+const Comment = ({ post_id, refresh }) => { // <- añadimos refresh como prop
   const [comments, setComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,7 +13,6 @@ const Comment = ({ post_id }) => {
     try {
       setIsLoading(true);
       const response = await axios.get(`${domain}getCommentsByPost/${post_id}`);
-      console.log(response.data);
       setComments(response.data.comments || []);
       setError(null);
     } catch (err) {
@@ -25,12 +25,10 @@ const Comment = ({ post_id }) => {
 
   useEffect(() => {
     fetchComments();
-  }, [post_id]);
+  }, [post_id, refresh]); // <- se recarga también cuando refresh cambia
 
   const formatRelativeTime = (timestamp) => {
-
     if (!timestamp) return "just now";
-    
     const now = new Date();
     const commentTime = new Date(timestamp);
     const diffInMinutes = Math.floor((now - commentTime) / (1000 * 60));
@@ -90,15 +88,15 @@ const Comment = ({ post_id }) => {
           >
             <div className="flex items-start">
               <img 
-                src={comment.user?.avatar || "/api/placeholder/40/40"} 
+                src={comment.user?.avatar || "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"} 
                 alt={`Avatar of ${comment.user?.name || 'User'}`} 
                 className="w-10 h-10 rounded-full mr-3 flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-medium text-zinc-200">
+                  <Link to={`/profile/${comment.user?.username ?? ""}`} className="hover:underline font-medium text-zinc-200">
                     {comment.user?.username || "Anon"}
-                  </h4>
+                  </Link>
                   <div className="flex items-center text-xs text-zinc-500">
                     <Clock size={12} className="mr-1" />
                     <span>{formatRelativeTime(comment.created_at)}</span>
