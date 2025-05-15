@@ -38,10 +38,19 @@ export const getCommentsByPost = async (req, res) => {
     const post = await Post.findById(id)
       .populate({
         path: 'comments',
-        populate: {
-          path: 'user',
-          select: 'username email' 
-        }
+        populate: [
+          {
+            path: 'user',
+            select: 'username email'
+          },
+          {
+            path: 'children',
+            populate: {
+              path: 'user',
+              select: 'username email'
+            }
+          }
+        ]
       });
 
     if (!post) {
@@ -51,8 +60,38 @@ export const getCommentsByPost = async (req, res) => {
     res.json({ comments: post.comments });
 
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ message: 'Error al obtener los comentarios' });
   }
 };
 
+
+export const replyToComment = async (req, res) => {
+  const parentId = req.params.parentId;
+  const { comment } = req.body;
+  const user_id = req.user.id;
+
+  try {
+    // Verificar existencia del comentario padre
+    const parentComment = await Comment.findById(parentId);
+    if (!parentComment) {
+      return res.status(404).json({ message: "Comentario padre no encontrado" });
+    }
+
+    // Crear el subcomentario
+    const reply = await Comment.create({
+      text: comment,
+      user: user_id
+    });
+
+    // Añadir el subcomentario al array `children` del padre
+    parentComment.children.push(reply._id);
+    await parentComment.save();
+
+    res.status(201).json({ message: "Respuesta añadida correctamente", reply });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error al responder comentario" });
+  }
+};

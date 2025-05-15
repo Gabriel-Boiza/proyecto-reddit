@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { domain } from '../../context/domain';
 
-const CommentForm = ({ post_id, onCommentPosted }) => { 
+const CommentForm = ({ post_id }) => {
   const [comment, setComment] = useState('');
   const [notification, setNotification] = useState({ message: '', type: '' });
   const textareaRef = useRef(null);
@@ -18,13 +18,9 @@ const CommentForm = ({ post_id, onCommentPosted }) => {
       
       setComment('');
       setNotification({ message: response.data.message, type: 'success' });
-
+      
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
-      }
-
-      if (onCommentPosted) {
-        onCommentPosted(); // <- ¡avisamos para refrescar comentarios!
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Error submitting the comment';
