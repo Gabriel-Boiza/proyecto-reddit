@@ -176,7 +176,7 @@ function Profile({isOwner}) {
                 <main className="content grid grid-cols-[5fr_2fr] gap-6 mx-auto p-4 ml-80 w-[100%]">
                     <section className="flex flex-col w-[100%]">
                         <div className="flex px-12 gap-6">
-                            <img className="w-18 rounded-full" 
+                            <img className="w-18 h-18 rounded-full" 
                               src={
                                     user.profileImage != ""
                                     ? `${domain}uploads/${user.profileImage}`
@@ -266,7 +266,7 @@ function Profile({isOwner}) {
                         </Tab.Group>
                     </section>
 
-                    <article className="p-10 h-[600px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
+                    <article className="p-10 max-h-[620px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
                         <ProfileCard user={user} isOwner={isOwner} deleteAccount={deleteAccount} />
                     </article>
                     
