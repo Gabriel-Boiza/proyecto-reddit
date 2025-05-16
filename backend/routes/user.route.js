@@ -14,8 +14,10 @@ route.get("/getUserInteractions", auth.verifyToken, UserController.getUserIntera
 route.get("/getUserInteractionsByUsername/:username", UserController.getUserInterectionsByUsername);
 
 route.get("/checkFollowStatus/:username", auth.verifyToken, UserController.checkFollowStatus)
+route.get("/getFollowedUsers", auth.verifyToken, UserController.getFollowedUsers)
 route.post("/followUser/:username", auth.verifyToken, UserController.followUser)
 route.post("/unfollowUser/:username", auth.verifyToken, UserController.unfollowUser)
+
 
 
 route.put('/updateProfile', auth.verifyToken, upload.single('file'), UserController.updateProfile);

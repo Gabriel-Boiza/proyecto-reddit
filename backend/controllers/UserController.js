@@ -1,11 +1,15 @@
 import User from "../models/User.js"
 import Comment from "../models/Comment.js";
 import Post from "../models/Post.js";
-import multer from "multer";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 
+export const getFollowedUsers = async (req, res) => {
+    const user_id = req.user.id
+    const user = await User.findById(user_id).populate("following")
 
+    res.json({following: user.following})
+}
 export const followUser = async (req, res) => {
     const username = req.params.username
     
