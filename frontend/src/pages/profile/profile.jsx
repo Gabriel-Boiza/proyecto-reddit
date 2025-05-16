@@ -149,7 +149,7 @@ function Profile({isOwner}) {
               }).then(() => {
                 // Redirige sin librerías
                 logout()
-                window.location.href = '/';
+                window.location.href = '/login';
               });
       
             } catch (error) {
