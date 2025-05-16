@@ -4,6 +4,7 @@ import Header from '../../layouts/header';
 import Aside from '../../layouts/aside';
 import { domain } from '../../context/domain';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function EditProfile() {
   const [activeTab, setActiveTab] = useState('info');
@@ -59,6 +60,24 @@ function EditProfile() {
     reader.readAsDataURL(file);
   };
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await axios.get(`${domain}getUserByCookie`, {
+          withCredentials: true,
+        });
+
+        const { name, username } = res.data.user;
+        setName(name || '');
+        setUsername(username || '');
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <>
       <Header />
@@ -85,7 +104,7 @@ function EditProfile() {
             <>
               <input
                 type="text"
-                placeholder="Name*"
+                placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -94,7 +113,7 @@ function EditProfile() {
 
               <input
                 type="text"
-                placeholder="Username*"
+                placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -107,7 +126,7 @@ function EditProfile() {
             <>
               <input
                 type="password"
-                placeholder="New Password*"
+                placeholder="New Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -116,7 +135,7 @@ function EditProfile() {
 
               <input
                 type="password"
-                placeholder="Confirm Password*"
+                placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
