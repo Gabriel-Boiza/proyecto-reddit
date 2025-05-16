@@ -27,23 +27,43 @@ const ChatFullPage = () => {
             setMessages(prev => [...prev, newMessage]);
         });
         
+        // Modificación: mejorar el manejo de estados de mensajes
         socket.on("message_delivered", (deliveredMessage) => {
             setMessages(prev => {
-                // Actualizar mensaje entregado si ya existe (evitar duplicados)
-                const exists = prev.some(m => m.timestamp === deliveredMessage.timestamp && m.content === deliveredMessage.content);
-                if (exists) {
-                    return prev.map(m => (m.timestamp === deliveredMessage.timestamp && m.content === deliveredMessage.content) ? {...m, status: "delivered"} : m);
-                }
-                return [...prev, { ...deliveredMessage, status: "delivered" }];
+                return prev.map(m => {
+                    // Identificar mensaje por timestamp y contenido
+                    if (m.timestamp === deliveredMessage.timestamp && 
+                        m.content === deliveredMessage.content &&
+                        m.from === deliveredMessage.from) {
+                        return { ...m, status: "delivered" };
+                    }
+                    return m;
+                });
             });
         });
         
         socket.on("message_pending", (pendingMessage) => {
+            // No añadimos mensajes pendientes que ya existan en el estado
             setMessages(prev => {
-                const exists = prev.some(m => m.timestamp === pendingMessage.timestamp && m.content === pendingMessage.content);
+                const exists = prev.some(m => 
+                    m.timestamp === pendingMessage.timestamp && 
+                    m.content === pendingMessage.content &&
+                    m.from === pendingMessage.from
+                );
+                
                 if (exists) {
-                    return prev.map(m => (m.timestamp === pendingMessage.timestamp && m.content === pendingMessage.content) ? {...m, status: "pending"} : m);
+                    // Si existe, solo actualizamos su estado a "pending" si es necesario
+                    return prev.map(m => {
+                        if (m.timestamp === pendingMessage.timestamp && 
+                            m.content === pendingMessage.content &&
+                            m.from === pendingMessage.from) {
+                            return { ...m, status: "pending" };
+                        }
+                        return m;
+                    });
                 }
+                
+                // Si no existe, lo añadimos como nuevo mensaje pendiente
                 return [...prev, { ...pendingMessage, status: "pending" }];
             });
         });
@@ -145,8 +165,10 @@ const ChatFullPage = () => {
             status: "pending"
         };
         
+        // Añadimos el mensaje a la UI primero
         setMessages(prev => [...prev, newMessage]);
         
+        // Luego lo enviamos por socket - mantenemos el formato original que espera el servidor
         socket.emit("message", message);
         
         setMessage("");
@@ -205,7 +227,7 @@ const ChatFullPage = () => {
                     messages.length > 0 ? (
                         <div className="space-y-3">
                             {messages.map((msg, index) => (
-                                <div key={index} className={`flex ${msg.from === user_id ? 'justify-end' : 'justify-start'}`}>
+                                <div key={`${msg.timestamp}-${index}`} className={`flex ${msg.from === user_id ? 'justify-end' : 'justify-start'}`}>
                                     {msg.from !== user_id && (
                                         <div className={`${getUserColor(otherUser?.username)} w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2 flex-shrink-0 self-end`}>
                                             {otherUser?.username?.charAt(0)?.toUpperCase() || "?"}
