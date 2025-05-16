@@ -5,6 +5,14 @@ import multer from "multer";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 
+
+export const checkFollowStatus = async (req, res) => {
+    const {username} = req.params
+    const user = await User.findOne({username: username})
+    console.log(user.name)
+    res.json("hola")
+}
+
 export const getAllUsers = async (req, res) => {
     const users = await User.find();
     res.json(users)

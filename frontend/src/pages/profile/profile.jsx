@@ -13,7 +13,7 @@ import ProfileCard from "../../components/profile/profileCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { domain } from "../../context/domain";
-import { Plus, ThumbsUp, ThumbsDown, Trash } from "lucide-react";
+import { Plus, ThumbsUp, ThumbsDown, Trash, UserPlus, UserMinus } from "lucide-react";
 import { Tab } from "@headlessui/react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
@@ -39,6 +39,25 @@ function Profile({isOwner}) {
     const [comments, setComments] = useState([]);
     const [upvotedPosts, setUpvotedPosts] = useState([]);
     const [downvotedPosts, setDownvotedPosts] = useState([]);
+    const [isFollowing, setIsFollowing] = useState(false);
+
+    useEffect(() => {
+        const fetchAll = async () => {
+            try {
+                const dataPromises = [
+                    userData(),
+                    userPosts(),
+                    fetchUserInteractions(),
+                    checkFollowStatus()
+                ];
+                await Promise.all(dataPromises);
+            } catch (error) {
+                console.error("Error loading profile data:", error);
+            }
+        };
+    
+        fetchAll();
+    }, []);
 
     const navigate = useNavigate()
     
@@ -57,20 +76,7 @@ function Profile({isOwner}) {
         } catch (error) {
             console.error("Error fetching interactions:", error.response?.data?.message);
         }
-    };
-    
-    useEffect(() => {
-        userData();
-        userPosts();
-        fetchUserInteractions();
-    }, []);
-
-    useEffect(() => {
-        if (user._id === user_id && !isOwner) {
-            navigate('/profile');
-        }
-    }, [user, user_id]);
-    
+    };    
 
     const userData = async () => {
         let response;
@@ -80,8 +86,6 @@ function Profile({isOwner}) {
             } else {
                 response = await axios.get(`${domain}getUserByUsername/${username}`, { withCredentials: true });
             }
-
-        
             
             const providedUser = response.data.user;
             
@@ -121,6 +125,64 @@ function Profile({isOwner}) {
         setPosts(posts.filter(post => post._id !== postId));
     };
 
+    const checkFollowStatus = async () => {
+        try {
+            if (!isOwner) {
+                const response = await axios.get(`${domain}checkFollowStatus/${username}`, { withCredentials: true });
+                setIsFollowing(response.data.isFollowing);
+            }
+        } catch (error) {
+            console.error("Error checking follow status:", error.response?.data?.message);
+        }
+    };
+
+    const handleFollowAccount = async () => {
+        try {
+            if (isFollowing) {
+                await axios.post(`${domain}unfollowUser/${username}`, {}, { withCredentials: true });
+                setIsFollowing(false);
+                Swal.fire({
+                    title: 'Unfollowed',
+                    text: `You have unfollowed ${username}`,
+                    icon: 'info',
+                    background: '#1e293b',
+                    color: '#f97316',
+                    confirmButtonColor: '#f97316',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false
+                });
+            } else {
+                await axios.post(`${domain}followUser/${username}`, {}, { withCredentials: true });
+                setIsFollowing(true);
+                Swal.fire({
+                    title: 'Following',
+                    text: `You are now following ${username}`,
+                    icon: 'success',
+                    background: '#1e293b',
+                    color: '#f97316',
+                    confirmButtonColor: '#f97316',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.message || 'Failed to update follow status',
+                icon: 'error',
+                background: '#1e293b',
+                color: '#f97316',
+                confirmButtonColor: '#f97316'
+            });
+        }
+    };
+
     const deleteAccount = () => {
         Swal.fire({
           title: 'Are you sure?',
@@ -147,7 +209,6 @@ function Profile({isOwner}) {
                 color: '#f97316',
                 confirmButtonColor: '#f97316',
               }).then(() => {
-                // Redirige sin librerías
                 logout()
                 window.location.href = '/';
               });
@@ -175,8 +236,8 @@ function Profile({isOwner}) {
             <div className="flex">
                 <main className="content grid grid-cols-[5fr_2fr] gap-6 mx-auto p-4 ml-80 w-[100%]">
                     <section className="flex flex-col w-[100%]">
-                        <div className="flex px-12 gap-6">
-                            <img className="w-18 h-18 rounded-full" 
+                        <div className="flex px-12 gap-6 items-center">
+                            <img className="w-18 rounded-full" 
                               src={
                                     user.profileImage != ""
                                     ? `${domain}uploads/${user.profileImage}`
@@ -188,6 +249,29 @@ function Profile({isOwner}) {
                                 <h2 className="text-3xl font-bold text-[#B7CAD4]">{user.username}</h2>
                                 <h2 className="text-lg text-[#8BA2AD]">{user.name}</h2>
                             </div>
+                            
+                            {!isOwner && (
+                                <button 
+                                    onClick={handleFollowAccount}
+                                    className={`ml-auto px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 ${
+                                        isFollowing 
+                                        ? 'bg-gray-700 hover:bg-red-700 text-white' 
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    }`}
+                                >
+                                    {isFollowing ? (
+                                        <>
+                                            <UserMinus size={18} />
+                                            <span>Unfollow</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserPlus size={18} />
+                                            <span>Follow</span>
+                                        </>
+                                    )}
+                                </button>
+                            )}
                         </div>
 
                         <Tab.Group className="w-[100%]">
