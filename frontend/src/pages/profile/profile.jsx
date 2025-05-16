@@ -7,13 +7,14 @@ import PostList from "../../components/profile/postList";
 import UpvotedPostList from "../../components/profile/upvotedPostList";
 import DownvotedPostList from "../../components/profile/downvotedPostList";
 import CommentedPostList from "../../components/profile/commentedPostList";
-
+import FollowersList from "../../components/profile/FollowersList";
+import FollowingList from "../../components/profile/FollowingList";
 // Card perfil
 import ProfileCard from "../../components/profile/profileCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { domain } from "../../context/domain";
-import { Plus, ThumbsUp, ThumbsDown, Trash, UserPlus, UserMinus } from "lucide-react";
+import { Plus, ThumbsUp, ThumbsDown, Trash, UserPlus, UserMinus, Users, UserCheck    } from "lucide-react";
 import { Tab } from "@headlessui/react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
@@ -39,6 +40,8 @@ function Profile({isOwner}) {
     const [comments, setComments] = useState([]);
     const [upvotedPosts, setUpvotedPosts] = useState([]);
     const [downvotedPosts, setDownvotedPosts] = useState([]);
+    const [followers, setFollowers] = useState([]);
+    const [following, setFollowing] = useState([]);
     const [isFollowing, setIsFollowing] = useState(false);
 
     useEffect(() => {
@@ -48,7 +51,9 @@ function Profile({isOwner}) {
                     userData(),
                     userPosts(),
                     fetchUserInteractions(),
-                    checkFollowStatus()
+                    checkFollowStatus(),
+                    fetchFollowers(),
+                    fetchFollowing()
                 ];
                 await Promise.all(dataPromises);
             } catch (error) {
@@ -75,6 +80,45 @@ function Profile({isOwner}) {
             console.error("Error fetching interactions:", error.response?.data?.message);
         }
     };    
+
+    const fetchFollowers = async () => {
+        try {
+            let response;
+            if (isOwner) {
+                // Ruta para obtener seguidores del usuario autenticado
+                response = await axios.get(`${domain}getFollowers`, { withCredentials: true });
+            } else {
+                // Ruta para obtener seguidores de otro usuario por nombre de usuario
+                response = await axios.get(`${domain}getFollowers/${username}`, { withCredentials: true });
+            }
+            
+            if (response.data && response.data.followers) {
+                setFollowers(response.data.followers);
+            }
+        } catch (error) {
+            console.error("Error fetching followers:", error.response?.data?.message);
+        
+        }
+    };
+    
+    const fetchFollowing = async () => {
+        try {
+            let response;
+            if (isOwner) {
+                // Ruta para obtener usuarios seguidos por el usuario autenticado
+                response = await axios.get(`${domain}getFollowedUsers`, { withCredentials: true });
+            } else {
+                // Ruta para obtener usuarios seguidos por otro usuario por nombre de usuario
+                response = await axios.get(`${domain}getFollowedUsers/${username}`, { withCredentials: true });
+            }
+            
+            if (response.data && response.data.following) {
+                setFollowing(response.data.following || []);
+            }
+        } catch (error) {
+            console.error("Error fetching following:", error.response?.data?.message);
+        }
+    };
 
     const userData = async () => {
         let response;
@@ -318,6 +362,32 @@ function Profile({isOwner}) {
                                 >
                                     Comments
                                 </Tab>
+                                <Tab
+                                    className={({ selected }) =>
+                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
+                                        ${selected
+                                        ? 'bg-blue-600 text-white shadow-md'
+                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                                    }
+                                >
+                                    <div className="flex items-center gap-1">
+                                        <Users size={14} />
+                                        <span>Followers</span>
+                                    </div>
+                                </Tab>
+                                <Tab
+                                    className={({ selected }) =>
+                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
+                                        ${selected
+                                        ? 'bg-blue-600 text-white shadow-md'
+                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                                    }
+                                >
+                                    <div className="flex items-center gap-1">
+                                        <UserCheck size={14} />
+                                        <span>Following</span>
+                                    </div>
+                                </Tab>
                             </Tab.List>
 
                             <Tab.Panels className="mt-4 max-h-[650px] overflow-y-auto pr-2 scrollPosts">
@@ -342,6 +412,18 @@ function Profile({isOwner}) {
                                 
                                 <Tab.Panel>
                                     <CommentedPostList comments={comments} />
+                                </Tab.Panel>
+
+                                <Tab.Panel>
+                                    <div className="max-h-[600px] overflow-y-auto pr-2">
+                                        <FollowersList followers={followers} />
+                                    </div>
+                                </Tab.Panel>
+
+                                <Tab.Panel>
+                                    <div className="max-h-[600px] overflow-y-auto pr-2">
+                                        <FollowingList following={following} />
+                                    </div>
                                 </Tab.Panel>
 
                             </Tab.Panels>

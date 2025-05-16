@@ -10,6 +10,28 @@ export const getFollowedUsers = async (req, res) => {
 
     res.json({following: user.following})
 }
+
+export const getFollowers = async (req, res) => {
+    const user_id = req.user.id
+    const user = await User.findById(user_id).populate("followers")
+
+    res.json({followers: user.followers})
+}
+
+export const getFollowedUsersByUsername = async (req, res) => {
+    const username = req.params.username
+    const user = await User.findOne({username: username}).populate("following")
+
+    res.json({following: user.following})
+}
+
+export const getFollowersByUsername = async (req, res) => {
+    const username = req.params.username
+    const user = await User.findOne({username: username}).populate("followers")
+
+    res.json({followers: user.followers})
+}
+
 export const followUser = async (req, res) => {
     const username = req.params.username
     
