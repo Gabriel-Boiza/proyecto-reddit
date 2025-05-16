@@ -32,7 +32,7 @@ function Profile({isOwner}) {
         profileImage: ""
     });
 
-    const {logout, user_id} = useAuth()
+    const {logout, isAuth} = useAuth()
     const {username} = useParams()
     const [posts, setPosts] = useState([]);
     const [copied, setCopied] = useState(false);
@@ -57,9 +57,7 @@ function Profile({isOwner}) {
         };
     
         fetchAll();
-    }, []);
-
-    const navigate = useNavigate()
+    }, [isAuth]); //cuando carga la variable vuelve a checkear el status
     
     const fetchUserInteractions = async () => {
         try {
@@ -127,7 +125,7 @@ function Profile({isOwner}) {
 
     const checkFollowStatus = async () => {
         try {
-            if (!isOwner) {
+            if (!isOwner && isAuth) {
                 const response = await axios.get(`${domain}checkFollowStatus/${username}`, { withCredentials: true });
                 setIsFollowing(response.data.isFollowing);
             }
@@ -250,7 +248,7 @@ function Profile({isOwner}) {
                                 <h2 className="text-lg text-[#8BA2AD]">{user.name}</h2>
                             </div>
                             
-                            {!isOwner && (
+                            {!isOwner && isAuth && (
                                 <button 
                                     onClick={handleFollowAccount}
                                     className={`ml-auto px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 ${

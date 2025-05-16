@@ -6,11 +6,51 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 
 
+export const followUser = async (req, res) => {
+    const username = req.params.username
+    
+    const user = await User.findOne({username: username})
+
+    await User.findByIdAndUpdate(
+        req.user.id,
+        { $addToSet: { following: user._id } }, // evita duplicados
+        { new: true } //devuelve el documento actualizado
+    );
+
+    await User.findByIdAndUpdate(
+        user._id,
+        {$addToSet: {followers: req.user.id}}
+    )
+
+    res.json({message: "succesful"})
+}
+
+export const unfollowUser = async (req, res) => {
+    const username = req.params.username;
+
+    const user = await User.findOne({ username: username });
+
+    await User.findByIdAndUpdate(
+        req.user.id,
+        { $pull: { following: user._id } }, // elimina el user del array de following
+        { new: true }
+    );
+
+    await User.findByIdAndUpdate(
+        user._id,
+        { $pull: { followers: req.user.id } }, // elimina al usuario actual del array de followers
+        {new: true}
+    );
+
+    res.json({ message: "unfollow successful" });
+};
+
+
 export const checkFollowStatus = async (req, res) => {
     const {username} = req.params
     const user = await User.findOne({username: username})
-    console.log(user.name)
-    res.json("hola")
+    const myUser = await User.findById(req.user.id)
+    res.json({isFollowing: myUser.following.includes(user._id)})
 }
 
 export const getAllUsers = async (req, res) => {
