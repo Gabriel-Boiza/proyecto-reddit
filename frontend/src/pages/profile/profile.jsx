@@ -14,7 +14,7 @@ import ProfileCard from "../../components/profile/profileCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { domain } from "../../context/domain";
-import { Plus, ThumbsUp, ThumbsDown, Trash, UserPlus, UserMinus, Users, UserCheck    } from "lucide-react";
+import { Plus, ThumbsUp, ThumbsDown, Trash, UserPlus, UserMinus, Users, UserCheck, MessageSquare } from "lucide-react";
 import { Tab } from "@headlessui/react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
@@ -35,6 +35,7 @@ function Profile({isOwner}) {
 
     const {logout, isAuth} = useAuth()
     const {username} = useParams()
+    const navigate = useNavigate();
     const [posts, setPosts] = useState([]);
     const [copied, setCopied] = useState(false);
     const [comments, setComments] = useState([]);
@@ -225,6 +226,10 @@ function Profile({isOwner}) {
         }
     };
 
+    const handleMessageUser = () => {
+        navigate(`/chat/${username}`);
+    };
+
     const deleteAccount = () => {
         Swal.fire({
           title: 'Are you sure?',
@@ -293,26 +298,37 @@ function Profile({isOwner}) {
                             </div>
                             
                             {!isOwner && isAuth && (
-                                <button 
-                                    onClick={handleFollowAccount}
-                                    className={`ml-auto px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 ${
-                                        isFollowing 
-                                        ? 'bg-gray-700 hover:bg-red-700 text-white' 
-                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
-                                    }`}
-                                >
-                                    {isFollowing ? (
-                                        <>
-                                            <UserMinus size={18} />
-                                            <span>Unfollow</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <UserPlus size={18} />
-                                            <span>Follow</span>
-                                        </>
-                                    )}
-                                </button>
+                                <div className="ml-auto flex gap-3">
+                                    <button 
+                                        onClick={handleMessageUser}
+                                        className="px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 
+                                            bg-green-600 hover:bg-green-700 text-white"
+                                    >
+                                        <MessageSquare size={18} />
+                                        <span>Message</span>
+                                    </button>
+                                    
+                                    <button 
+                                        onClick={handleFollowAccount}
+                                        className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 ${
+                                            isFollowing 
+                                            ? 'bg-gray-700 hover:bg-red-700 text-white' 
+                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        }`}
+                                    >
+                                        {isFollowing ? (
+                                            <>
+                                                <UserMinus size={18} />
+                                                <span>Unfollow</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserPlus size={18} />
+                                                <span>Follow</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             )}
                         </div>
 

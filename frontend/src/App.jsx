@@ -7,7 +7,7 @@ import CreatePost from './pages/posts/createPost.jsx';
 import Profile from './pages/profile/profile.jsx';
 import EditProfile from './pages/profile/editProfile.jsx';
 import ProfilePrueba from './pages/profile/profileprueba.jsx';
-
+import Chat from './pages/chat/chat.jsx';
 import AuthProvider from './context/authProvider.jsx';
 import PrivateRoute from './components/privateRoute.jsx';
 
@@ -25,6 +25,7 @@ function App() {
           <Route path="/profile/:username" element={<Profile  isOwner={false}/>} />
 
           <Route element={<PrivateRoute />}>
+            <Route path="/chat/:username" element={<Chat/>}/>
             <Route path="/createPost" element={<CreatePost />} />
             <Route path="/profile" element={<Profile isOwner={true}/>} />
             <Route path="/editProfile" element={<EditProfile />} />
