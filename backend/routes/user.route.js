@@ -13,7 +13,7 @@ route.get("/getUserByCookie", auth.verifyToken, UserController.getUserByCookie)
 route.get("/getUserInteractions", auth.verifyToken, UserController.getUserInteractions);
 route.get("/getUserInteractionsByUsername/:username", UserController.getUserInterectionsByUsername);
 
-
+route.get("/checkFollowStatus/:username", UserController.checkFollowStatus)
 
 route.put('/updateProfile', auth.verifyToken, upload.single('file'), UserController.updateProfile);
 
