@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";  // Asegúrate de tener importado Link
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { ArrowUp, ArrowDown, MessageSquare } from "lucide-react";
@@ -11,6 +11,7 @@ function Post({ post }) {
   const [counter, setCounter] = useState(post.votes.upvotes.length - post.votes.downvotes.length);
   const [voteState, setVoteState] = useState(0); // 0 no ha votado, 1 like, -1 dislike
   const { isAuth } = useAuth();
+  const navigate = useNavigate();
 
   const handleUpVote = async (e) => {
     e.preventDefault();
@@ -44,6 +45,12 @@ function Post({ post }) {
     }
   };
 
+  const navigateToProfile = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/profile/${post.user_id?.username}`);
+  };
+
   useEffect(() => {
     if (!isAuth) return;
     axios
@@ -72,30 +79,32 @@ function Post({ post }) {
   return (
     <>
       <Link to={`/post/${post._id}`} className="block">
-      <Card className="bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-colors duration-200 cursor-pointer">
-        <CardContent className="p-4">
-          <div className="text-sm text-muted-foreground mb-1">
-            
-            <Link to={`/profile/${post.user_id?.username}`} className="font-medium text-white hover:underline">
-              {post.user_id?.username ?? "Anon"}
-            </Link>{" "}
-            •{" "}
-            {new Date(post.created_at).toLocaleString([], {
-              day: "2-digit",
-              month: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </div>
-          <h2 className="text-lg font-semibold">{post.title}</h2>
-          <p className="text-sm text-gray-400 mb-3">{post.description}</p>
-          {post?.file_url && (
-            <img
-              src={`${domain}uploads/${post.file_url}`}
-              alt="post"
-              className="rounded-lg border-muted shadow mb-3 w-full object-cover"
-            />
-          )}
+        <Card className="bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-colors duration-200 cursor-pointer">
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground mb-1">
+              <span 
+                onClick={navigateToProfile}
+                className="font-medium text-white hover:underline cursor-pointer"
+              >
+                {post.user_id?.username ?? "Anon"}
+              </span>{" "}
+              •{" "}
+              {new Date(post.created_at).toLocaleString([], {
+                day: "2-digit",
+                month: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </div>
+            <h2 className="text-lg font-semibold">{post.title}</h2>
+            <p className="text-sm text-gray-400 mb-3">{post.description}</p>
+            {post?.file_url && (
+              <img
+                src={`${domain}uploads/${post.file_url}`}
+                alt="post"
+                className="rounded-lg border-muted shadow mb-3 w-full object-cover"
+              />
+            )}
 
             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <div className={getVoteContainerClass()}>

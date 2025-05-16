@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { domain } from "../../context/domain";
 import { Plus, ThumbsUp, ThumbsDown, Trash } from "lucide-react";
 import { Tab } from "@headlessui/react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 
 
@@ -32,14 +32,15 @@ function Profile({isOwner}) {
         profileImage: ""
     });
 
-    const {logout} = useAuth()
+    const {logout, user_id} = useAuth()
     const {username} = useParams()
-
     const [posts, setPosts] = useState([]);
     const [copied, setCopied] = useState(false);
     const [comments, setComments] = useState([]);
     const [upvotedPosts, setUpvotedPosts] = useState([]);
     const [downvotedPosts, setDownvotedPosts] = useState([]);
+
+    const navigate = useNavigate()
     
     const fetchUserInteractions = async () => {
         try {
@@ -59,12 +60,16 @@ function Profile({isOwner}) {
     };
     
     useEffect(() => {
-        console.log(username)
         userData();
         userPosts();
         fetchUserInteractions();
-        console.log(`${domain}uploads/${user.profileImage}`)
     }, []);
+
+    useEffect(() => {
+        if (user._id === user_id && !isOwner) {
+            navigate('/profile');
+        }
+    }, [user, user_id]);
     
 
     const userData = async () => {
@@ -75,8 +80,11 @@ function Profile({isOwner}) {
             } else {
                 response = await axios.get(`${domain}getUserByUsername/${username}`, { withCredentials: true });
             }
-    
+
+        
+            
             const providedUser = response.data.user;
+            
             setUser({
                 username: providedUser.username,
                 name: providedUser.name,
@@ -87,6 +95,7 @@ function Profile({isOwner}) {
                 downvotes: providedUser.downvotes,
                 profileImage: providedUser.profileImage
             });
+
         } catch (error) {
             console.log(error.response?.data?.message);
         }

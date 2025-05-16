@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { domain } from "../../context/domain";
 import { MessageCircle, ThumbsUp, ThumbsDown, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import ReplyToComment from "./replyToComment"; // Importamos el nuevo componente
+import ReplyToComment from "./replyToComment";
+import { domain } from "../../context/domain";
+import { useAuth } from "../../context/authContext";
 
 const Comment = ({ post_id, refresh }) => {
   const [comments, setComments] = useState([]);
@@ -29,6 +30,8 @@ const Comment = ({ post_id, refresh }) => {
     fetchComments();
   }, [post_id, refresh]);
 
+  const {user_id} = useAuth()
+
   const formatRelativeTime = (timestamp) => {
     if (!timestamp) return "just now";
     const now = new Date();
@@ -45,20 +48,23 @@ const Comment = ({ post_id, refresh }) => {
     return `about ${diffInDays} ${diffInDays === 1 ? 'day' : 'days'}`;
   };
 
-  // Función recursiva para mostrar comentarios y sus hijos (reply en árbol)
   const renderComments = (commentsList) => {
+
     return commentsList.map((comment) => (
       <div key={comment._id} className="bg-zinc-900 rounded-lg p-4 border border-zinc-800 hover:border-zinc-700 transition-colors">
         <div className="flex items-start">
           <img 
-            src={comment.user?.avatar || "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"} 
+            src={comment.user.profileImage
+              ? `${domain}uploads/${comment.user.profileImage}`
+              : "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"}
+            
             alt={`Avatar of ${comment.user?.name || 'User'}`} 
             className="w-10 h-10 rounded-full mr-3 flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
               <Link to={`/profile/${comment.user?.username ?? ""}`} className="hover:underline font-medium text-zinc-200">
-                {comment.user?.username || "Anon"}
+                {comment.user?._id == user_id ? "Tú" : comment.user?.username}
               </Link>
               <div className="flex items-center text-xs text-zinc-500">
                 <Clock size={12} className="mr-1" />

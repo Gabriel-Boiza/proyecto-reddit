@@ -8,7 +8,7 @@ function SearchBar() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const debounceTimeout = useRef(null);
-  const resultsRef = useRef(null); // ✅ referencia al contenedor
+  const resultsRef = useRef(null); 
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -30,7 +30,7 @@ function SearchBar() {
   const fetchResults = async (searchTerm) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/searchPosts?query=${encodeURIComponent(searchTerm)}`,
+        `${domain}searchPosts?query=${encodeURIComponent(searchTerm)}`,
         { credentials: "include" }
       );
       const data = await response.json();

@@ -41,13 +41,11 @@ export const getCommentsByPost = async (req, res) => {
         populate: [
           {
             path: 'user',
-            select: 'username email'
           },
           {
             path: 'children',
             populate: {
               path: 'user',
-              select: 'username email'
             }
           }
         ]
