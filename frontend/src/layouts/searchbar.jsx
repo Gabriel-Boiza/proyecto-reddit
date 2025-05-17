@@ -55,7 +55,7 @@ function SearchBar() {
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="flex items-center space-x-2 bg-[#2a3236] hover:bg-[#333D42] rounded-full px-4 py-2">
+      <div className="flex items-center space-x-2 bg-[#2a3236] hover:bg-[#333D42] rounded-full px-4">
         <svg
           className="search-icon w-5 h-5 text-white"
           xmlns="http://www.w3.org/2000/svg"
