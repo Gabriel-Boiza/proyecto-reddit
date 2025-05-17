@@ -19,18 +19,21 @@ const Comment = ({ post_id, refresh }) => {
   const { user_id } = useAuth();
 
   const fetchComments = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(`${domain}getCommentsByPost/${post_id}`);
-      setComments(response.data.comments || []);
-      setError(null);
-    } catch (err) {
-      console.error("Error loading comments:", err);
-      setError("Failed to load comments. Please try again later.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    setIsLoading(true);
+    const response = await axios.get(`${domain}getCommentsByPost/${post_id}`);
+    const commentsData = response.data.comments || [];
+    commentsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    setComments(commentsData);
+    setError(null);
+  } catch (err) {
+    console.error("Error loading comments:", err);
+    setError("Failed to load comments. Please try again later.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchComments();
@@ -74,7 +77,7 @@ const Comment = ({ post_id, refresh }) => {
       );
 
       setComments(comments.map(comment =>
-        comment._id === commentId ? { ...comment, text: editedText } : comment
+        comment._id === commentId ? { ...comment, text: editedText, edited: true } : comment
       ));
       setEditingComment(null);
       setEditedText("");
@@ -165,7 +168,9 @@ const Comment = ({ post_id, refresh }) => {
               </Link>
               <div className="flex items-center text-xs text-zinc-500">
                 <Clock size={12} className="mr-1" />
-                <span>{formatRelativeTime(comment.created_at)}</span>
+                <span>
+                  {formatRelativeTime(comment.created_at)}{comment.edited ? " (edited)" : ""}
+                </span>
               </div>
             </div>
 
@@ -286,16 +291,15 @@ const Comment = ({ post_id, refresh }) => {
 
       {!isLoading && !error && comments.length === 0 && (
         <div className="text-center py-6 border border-dashed border-zinc-700 rounded-lg">
-          <MessageCircle size={24} className="mx-auto text-zinc-500 mb-2" />
-          <p className="text-zinc-400">No comments yet. Be the first to comment!</p>
+          <Message Circle size={28} className="mx-auto mb-2 text-zinc-500" />
+          <p className="text-zinc-500">No comments yet. Be the first to comment!</p>
         </div>
       )}
-
-      <div className="space-y-4">
-        {renderComments([...comments].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))}
-      </div>
-    </div>
-  );
+      <div className="space-y-4 mt-4">
+    {renderComments(comments)}
+  </div>
+</div>
+);
 };
 
 export default Comment;

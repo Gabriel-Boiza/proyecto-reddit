@@ -3,7 +3,6 @@ import Post from "../models/Post.js";
 import User from "../models/User.js";
 import mongoose from "mongoose";
 
-// Crear un nuevo comentario
 export const createComment = async (req, res) => {
   const { post_id, comment } = req.body;
   const user_id = req.user.id;
@@ -30,7 +29,6 @@ export const createComment = async (req, res) => {
   }
 };
 
-// Obtener comentarios de un post
 export const getCommentsByPost = async (req, res) => {
   const { id } = req.params;
 
@@ -59,7 +57,6 @@ export const getCommentsByPost = async (req, res) => {
   }
 };
 
-// Responder a comentario
 export const replyToComment = async (req, res) => {
   const parentId = req.params.parentId;
   const { comment } = req.body;
@@ -87,7 +84,6 @@ export const replyToComment = async (req, res) => {
   }
 };
 
-// ✅ ACTUALIZAR COMENTARIO CON VERIFICACIÓN Y AUTORIZACIÓN
 export const updateComment = async (req, res) => {
   try {
     const commentId = req.params.id;
@@ -103,13 +99,14 @@ export const updateComment = async (req, res) => {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    // Solo el autor puede editar
     if (comment.user.toString() !== userId) {
       return res.status(403).json({ message: "No autorizado" });
     }
 
     comment.text = text;
+    comment.edited = true;
     await comment.save();
+
 
     res.status(200).json({ message: "Comment updated", comment });
   } catch (err) {
@@ -118,7 +115,6 @@ export const updateComment = async (req, res) => {
   }
 };
 
-// ✅ ELIMINAR COMENTARIO CON REFERENCIAS
 export const deleteComment = async (req, res) => {
   try {
     const commentId = req.params.id;
@@ -133,16 +129,13 @@ export const deleteComment = async (req, res) => {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    // Solo el autor puede borrar
     if (comment.user.toString() !== userId) {
       return res.status(403).json({ message: "No autorizado" });
     }
 
-    // Eliminar referencias en el post y el usuario
     await Post.updateMany({}, { $pull: { comments: commentId } });
     await User.updateMany({}, { $pull: { comments: commentId } });
 
-    // Si es hijo, eliminarlo de su padre
     await Comment.updateMany({}, { $pull: { children: commentId } });
 
     await Comment.findByIdAndDelete(commentId);
