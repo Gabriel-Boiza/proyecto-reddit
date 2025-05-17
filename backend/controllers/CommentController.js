@@ -1,53 +1,50 @@
-import Comment from "../models/Comment.js"
-import Post from "../models/Post.js"
-import User from "../models/User.js"
+import Comment from "../models/Comment.js";
+import Post from "../models/Post.js";
+import User from "../models/User.js";
+import mongoose from "mongoose";
 
+// Crear un nuevo comentario
 export const createComment = async (req, res) => {
-    const {post_id, comment} = req.body
-    const user_id = req.user.id
-    
-    try {
+  const { post_id, comment } = req.body;
+  const user_id = req.user.id;
 
-        let post = await Post.findById(post_id)
-        if(!post){throw new Error("Post not found")}
-        let user = await User.findById(user_id)
-        if(!user){throw new Error("User not found")}
+  try {
+    const post = await Post.findById(post_id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
 
-        
-        const submitedComment = await Comment.create({
-            text: comment,
-            user: user_id
-        })
+    const user = await User.findById(user_id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-        post.comments.push(submitedComment._id)
-        user.comments.push(submitedComment._id)
+    const submitedComment = await Comment.create({ text: comment, user: user_id });
 
-        await post.save()
-        await user.save()
+    post.comments.push(submitedComment._id);
+    user.comments.push(submitedComment._id);
 
-        res.json({ message: "Comment successfully posted!"});
-    } catch (error) {
-        res.json({message: error.message})
-    }
-}
+    await post.save();
+    await user.save();
 
+    res.status(201).json({ message: "Comment successfully posted!", comment: submitedComment });
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Obtener comentarios de un post
 export const getCommentsByPost = async (req, res) => {
   const { id } = req.params;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID de post inválido" });
+    }
+
     const post = await Post.findById(id)
       .populate({
         path: 'comments',
         populate: [
-          {
-            path: 'user',
-          },
-          {
-            path: 'children',
-            populate: {
-              path: 'user',
-            }
-          }
+          { path: 'user' },
+          { path: 'children', populate: { path: 'user' } }
         ]
       });
 
@@ -55,41 +52,104 @@ export const getCommentsByPost = async (req, res) => {
       return res.status(404).json({ message: 'Post no encontrado' });
     }
 
-    res.json({ comments: post.comments });
-
+    res.status(200).json({ comments: post.comments || [] });
   } catch (error) {
-    console.log(error);
+    console.error("Error getting comments:", error);
     res.status(500).json({ message: 'Error al obtener los comentarios' });
   }
 };
 
-
+// Responder a comentario
 export const replyToComment = async (req, res) => {
   const parentId = req.params.parentId;
   const { comment } = req.body;
   const user_id = req.user.id;
 
   try {
-    // Verificar existencia del comentario padre
-    const parentComment = await Comment.findById(parentId);
-    if (!parentComment) {
-      return res.status(404).json({ message: "Comentario padre no encontrado" });
+    if (!mongoose.Types.ObjectId.isValid(parentId)) {
+      return res.status(400).json({ message: "ID de comentario inválido" });
     }
 
-    // Crear el subcomentario
-    const reply = await Comment.create({
-      text: comment,
-      user: user_id
-    });
+    const parentComment = await Comment.findById(parentId);
+    if (!parentComment) return res.status(404).json({ message: "Comentario padre no encontrado" });
 
-    // Añadir el subcomentario al array `children` del padre
+    const reply = await Comment.create({ text: comment, user: user_id });
+
     parentComment.children.push(reply._id);
     await parentComment.save();
 
-    res.status(201).json({ message: "Respuesta añadida correctamente", reply });
+    const populatedReply = await Comment.findById(reply._id).populate('user');
 
+    res.status(201).json({ message: "Respuesta añadida correctamente", reply: populatedReply });
   } catch (error) {
-    console.log(error);
+    console.error("Error replying to comment:", error);
     res.status(500).json({ message: "Error al responder comentario" });
+  }
+};
+
+// ✅ ACTUALIZAR COMENTARIO CON VERIFICACIÓN Y AUTORIZACIÓN
+export const updateComment = async (req, res) => {
+  try {
+    const commentId = req.params.id;
+    const { text } = req.body;
+    const userId = req.user.id;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({ message: "ID de comentario inválido" });
+    }
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    // Solo el autor puede editar
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ message: "No autorizado" });
+    }
+
+    comment.text = text;
+    await comment.save();
+
+    res.status(200).json({ message: "Comment updated", comment });
+  } catch (err) {
+    console.error("Error updating comment:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// ✅ ELIMINAR COMENTARIO CON REFERENCIAS
+export const deleteComment = async (req, res) => {
+  try {
+    const commentId = req.params.id;
+    const userId = req.user.id;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({ message: "ID de comentario inválido" });
+    }
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    // Solo el autor puede borrar
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ message: "No autorizado" });
+    }
+
+    // Eliminar referencias en el post y el usuario
+    await Post.updateMany({}, { $pull: { comments: commentId } });
+    await User.updateMany({}, { $pull: { comments: commentId } });
+
+    // Si es hijo, eliminarlo de su padre
+    await Comment.updateMany({}, { $pull: { children: commentId } });
+
+    await Comment.findByIdAndDelete(commentId);
+
+    res.status(200).json({ message: "Comment deleted" });
+  } catch (err) {
+    console.error("Error deleting comment:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

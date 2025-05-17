@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { domain } from '../../context/domain';
 
-const CommentForm = ({ post_id }) => {
+const CommentForm = ({ post_id, onSuccess }) => {
   const [comment, setComment] = useState('');
   const [notification, setNotification] = useState({ message: '', type: '' });
   const textareaRef = useRef(null);
@@ -12,13 +12,18 @@ const CommentForm = ({ post_id }) => {
     try {
       const response = await axios.post(
         `${domain}createComment`, 
-        { post_id: post_id, comment: comment }, 
+        { post_id, comment }, 
         { withCredentials: true }
       );
       
       setComment('');
       setNotification({ message: response.data.message, type: 'success' });
-      
+
+      // Llama a la función para refrescar comentarios
+      if (typeof onSuccess === 'function') {
+        onSuccess();
+      }
+
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
@@ -29,19 +34,16 @@ const CommentForm = ({ post_id }) => {
   };
   
   const handleTextareaChange = (e) => {
-    const textarea = e.target;
-    const value = textarea.value;
-    
+    const value = e.target.value;
     if (value.length <= MAX_CHARS) {
       setComment(value);
-      
-      textarea.style.height = 'auto';
-      
-      const newHeight = Math.max(40, textarea.scrollHeight);
-      textarea.style.height = `${newHeight}px`;
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = `${Math.max(40, textareaRef.current.scrollHeight)}px`;
+      }
     }
   };
-  
+
   useEffect(() => {
     if (comment === '' && textareaRef.current) {
       textareaRef.current.style.height = '40px';
@@ -53,7 +55,6 @@ const CommentForm = ({ post_id }) => {
       const timer = setTimeout(() => {
         setNotification({ message: '', type: '' });
       }, 5000);
-      
       return () => clearTimeout(timer);
     }
   }, [notification]);
@@ -66,24 +67,21 @@ const CommentForm = ({ post_id }) => {
   };
   
   return (
-    <div className="w-full">
+    <div className="w-full mb-6">
       <div className="rounded-lg border border-zinc-700 flex flex-col">
-
         <div className="p-3">
-          <div className="relative">
-            <textarea
-              ref={textareaRef}
-              value={comment}
-              onChange={handleTextareaChange}
-              placeholder="Add a comment..."
-              className="w-full rounded p-3 text-gray-200 min-h-[40px] resize-none focus:outline-none"
-              style={{
-                overflow: comment.length > 100 ? 'auto' : 'hidden'
-              }}
-            />
-          </div>
+          <textarea
+            ref={textareaRef}
+            value={comment}
+            onChange={handleTextareaChange}
+            placeholder="Add a comment..."
+            className="w-full rounded p-3 text-gray-200 min-h-[40px] resize-none focus:outline-none"
+            style={{
+              overflow: comment.length > 100 ? 'auto' : 'hidden'
+            }}
+          />
         </div>
-        
+
         {notification.message && (
           <div className={`ml-3 mb-2 px-3 py-1 rounded text-sm inline-block ${
             notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -91,7 +89,7 @@ const CommentForm = ({ post_id }) => {
             {notification.message}
           </div>
         )}
-        
+
         <div className="flex justify-end items-center p-2">
           <span className="text-gray-400 mr-4 text-sm">
             {comment.length}/{MAX_CHARS}
