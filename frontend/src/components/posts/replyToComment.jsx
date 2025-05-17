@@ -1,82 +1,103 @@
 import { useState } from "react";
 import axios from "axios";
 import { domain } from "../../context/domain";
+import { useAuth } from "../../context/authContext";
+import Swal from "sweetalert2";
 
-const ReplyToComment = ({ parentId, onSuccess, onCancel }) => {
-  const [comment, setComment] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+const ReplyForm = ({ post_id, parent_id, onSuccess }) => {
+  const [replyText, setReplyText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user_id } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("[ReplyToComment] handleSubmit called");
-    console.log("Parent ID:", parentId);
-    console.log("Comment content:", comment);
-
-    if (!comment.trim()) {
-      console.warn("[ReplyToComment] Empty comment, not sending");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
+    
+    if (!replyText.trim()) return;
+    
+    setIsSubmitting(true);
+    
     try {
-      console.log("[ReplyToComment] Sending POST request to:", `${domain}replyComment/${parentId}`);
-      const response = await axios.post(`${domain}replyComment/${parentId}`, { comment });
-      console.log("[ReplyToComment] Response received:", response.data);
-
-      setComment("");
+      await axios.post(
+        `${domain}createComment`,
+        {
+          text: replyText,
+          post_id: post_id,
+          parent_id: parent_id
+        },
+        { withCredentials: true }
+      );
+      
+      setReplyText("");
+      
+      Swal.fire({
+        icon: "success",
+        title: "Reply posted",
+        toast: true,
+        timer: 2000,
+        position: "top-end",
+        showConfirmButton: false,
+        background: "#1e1e1e",
+        color: "#ffa500"
+      });
+      
       if (onSuccess) {
-        console.log("[ReplyToComment] Calling onSuccess callback");
         onSuccess();
       }
-      if (onCancel) {
-        console.log("[ReplyToComment] Calling onCancel callback to close form");
-        onCancel();
-      }
-    } catch (err) {
-      console.error("[ReplyToComment] Error sending reply:", err);
-      setError("Error sending reply. Please try again.");
+    } catch (error) {
+      console.error("Error posting reply:", error);
+      
+      Swal.fire({
+        icon: "error",
+        title: "Failed to post reply",
+        text: "Please try again later.",
+        background: "#1e1e1e",
+        color: "#ffa500",
+        confirmButtonColor: "#ffa500"
+      });
     } finally {
-      setLoading(false);
-      console.log("[ReplyToComment] Loading set to false");
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-2">
+    <form onSubmit={handleSubmit} className="mb-4">
       <textarea
-        className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-zinc-300"
-        rows={3}
-        placeholder="Write your reply..."
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        required
-      />
-      {error && <p className="text-red-500 mt-1">{error}</p>}
-      <div className="flex justify-end mt-1 space-x-2">
-        <button
-          type="button"
-          onClick={() => {
-            console.log("[ReplyToComment] Cancel button clicked");
-            onCancel && onCancel();
-          }}
-          className="px-3 py-1 rounded bg-zinc-700 hover:bg-zinc-600 text-sm"
-        >
-          Cancel
-        </button>
+        value={replyText}
+        onChange={(e) => setReplyText(e.target.value)}
+        placeholder="Add a reply..."
+        className="w-full p-3 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 transition"
+        rows={2}
+        disabled={isSubmitting || !user_id}
+      ></textarea>
+      
+      <div className="flex justify-end mt-2">
         <button
           type="submit"
-          disabled={loading}
-          className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-sm text-white"
+          disabled={isSubmitting || !replyText.trim() || !user_id}
+          className={`px-4 py-2 rounded-md text-sm font-medium ${
+            isSubmitting || !replyText.trim() || !user_id 
+              ? "bg-zinc-700 text-zinc-400 cursor-not-allowed" 
+              : "bg-orange-600 hover:bg-orange-700 text-white"
+          }`}
         >
-          {loading ? "Sending..." : "Reply"}
+          {isSubmitting ? (
+            <>
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2 align-middle"></span>
+              <span>Posting...</span>
+            </>
+          ) : (
+            "Post Reply"
+          )}
         </button>
       </div>
+      
+      {!user_id && (
+        <p className="text-zinc-500 text-xs mt-1 text-center">
+          You need to be logged in to reply.
+        </p>
+      )}
     </form>
   );
 };
 
-export default ReplyToComment;
+export default ReplyForm;
