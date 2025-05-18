@@ -284,14 +284,19 @@ function Profile({isOwner}) {
                 <main className="content grid grid-cols-[5fr_2fr] gap-6 mx-auto p-4 ml-80 w-[100%]">
                     <section className="flex flex-col w-[100%]">
                         <div className="flex px-12 gap-6 items-center">
-                            <img className="w-18 rounded-full" 
-                              src={
-                                    user.profileImage != ""
+                            <img
+                                className="w-18 h-18 rounded-full"
+                                src={
+                                    user.profileImage
                                     ? `${domain}uploads/${user.profileImage}`
                                     : "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
                                 }
-                            alt=""
-                             />
+                                onError={(e) => {
+                                    e.target.onerror = null; // evita bucle infinito si falla la imagen por defecto
+                                    e.target.src = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png";
+                                }}
+                                alt=""
+                            />
                             <div className="flex flex-col gap-1">
                                 <h2 className="text-3xl font-bold text-[#B7CAD4]">{user.username}</h2>
                                 <h2 className="text-lg text-[#8BA2AD]">{user.name}</h2>

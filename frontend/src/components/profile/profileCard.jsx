@@ -53,13 +53,18 @@ function ProfileCard({ user, deleteAccount, isOwner }) {
             <h3 className="text-xs font-bold text-gray-400 mb-2">SETTINGS</h3>
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <img className="w-8 h-8 rounded-full" 
+                <img
+                  className="w-8 h-8 rounded-full"
                   src={
-                  user.profileImage != ""
-                  ? `${domain}uploads/${user.profileImage}`
-                  : "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
+                    user.profileImage
+                      ? `${domain}uploads/${user.profileImage}`
+                      : "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
                   }
-                  lt=""
+                  onError={(e) => {
+                    e.target.onerror = null; // evita bucle infinito si falla la imagen por defecto
+                    e.target.src = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png";
+                  }}
+                  alt=""
                 />
                 <div>
                   <p className="text-white text-sm">Profile</p>
