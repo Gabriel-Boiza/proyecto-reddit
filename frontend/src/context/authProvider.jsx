@@ -7,6 +7,7 @@ const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [isAuth, setIsAuth] = useState(false);
     const [user_id, setUser_id] = useState()
+    const [username, setUsername] = useState()
     const [isError, setIsError] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -31,24 +32,27 @@ const AuthProvider = ({ children }) => {
             setIsAuth(false);
             setMessage("Logged out successfully");
             setIsError(false);
+            window.location.reload(); // 🔄 Recarga la página
         } catch (error) {
             setMessage("Error during logout");
             setIsError(true);
         }
     };
 
+
     useEffect(() => {
         axios.get(`${domain}check-auth`, { withCredentials: true })
             .then((response) => {
                 setIsAuth(true)
-                setUser_id(response.data.user_id)
+                setUser_id(response.data.user.id)
+                setUsername(response.data.user.username)
             })
             .catch(() => setIsAuth(false))
             .finally(() => setLoading(false));
     }, []);
 
     return (
-        <AuthContext.Provider value={{ isAuth, isError, message, loading, user_id, login, logout }}>
+        <AuthContext.Provider value={{ isAuth, isError, message, loading, user_id, username, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

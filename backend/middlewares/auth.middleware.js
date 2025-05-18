@@ -20,7 +20,7 @@ export const checkToken = async (req, res) => {
         
         if(!token){throw new Error("Any token")}
         const decoded = jwt.verify(token, process.env.SECRET_JWT_KEY)
-        res.json({user_id: decoded.id})
+        res.json({user: decoded})
     } catch (error) {
         res.status(401).json({message: error.message})
     }
