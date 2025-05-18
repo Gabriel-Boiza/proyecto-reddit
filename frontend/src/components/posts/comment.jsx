@@ -410,7 +410,7 @@ const Comment = ({ post_id, refresh }) => {
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
                 <Link to={`/profile/${comment.user?.username ?? ""}`} className="hover:underline font-medium text-zinc-200">
-                  {comment.user?._id === user_id ? "Tú" : comment.user?.username}
+                  {comment.user?._id === user_id ? "You" : comment.user?.username}
                 </Link>
                 <div className="flex items-center text-xs text-zinc-500">
                   <Clock size={12} className="mr-1" />

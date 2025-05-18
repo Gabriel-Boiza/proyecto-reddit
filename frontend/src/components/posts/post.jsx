@@ -10,7 +10,7 @@ import { domain } from "../../context/domain";
 function Post({ post }) {
   const [counter, setCounter] = useState(post.votes.upvotes.length - post.votes.downvotes.length);
   const [voteState, setVoteState] = useState(0); // 0 no ha votado, 1 like, -1 dislike
-  const { isAuth } = useAuth();
+  const { isAuth, user_id, username } = useAuth();
   const navigate = useNavigate();
 
   const handleUpVote = async (e) => {
@@ -48,10 +48,16 @@ function Post({ post }) {
   const navigateToProfile = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate(`/profile/${post.user_id?.username}`);
+    if(post.user_id.username == username){
+      navigate("/profile")
+    }
+    else{
+      navigate(`/profile/${post.user_id.username}`)
+    }
   };
 
   useEffect(() => {
+    console.log(username)
     if (!isAuth) return;
     axios
       .post(`${domain}getVoteState`, { post_id: post._id }, { withCredentials: true })
@@ -86,7 +92,7 @@ function Post({ post }) {
                 onClick={navigateToProfile}
                 className="font-medium text-white hover:underline cursor-pointer"
               >
-                {post.user_id?.username ?? "Anon"}
+                {post.user_id?.username == username ? "You" : post.user_id?.username}
               </span>{" "}
               •{" "}
               {new Date(post.created_at).toLocaleString([], {
