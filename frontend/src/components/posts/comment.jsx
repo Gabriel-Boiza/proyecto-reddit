@@ -15,6 +15,8 @@ const Comment = ({ post_id, refresh }) => {
   const [editingComment, setEditingComment] = useState(null);
   const [editedText, setEditedText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Estado para tracking de operaciones asíncronas de likes/dislikes
+  const [pendingLikeActions, setPendingLikeActions] = useState({});
 
   const { user_id } = useAuth();
 
@@ -24,8 +26,23 @@ const Comment = ({ post_id, refresh }) => {
       const response = await axios.get(`${domain}getCommentsByPost/${post_id}`);
       console.log("Comments data:", response.data);
       const commentsData = response.data.comments || [];
-      commentsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      setComments(commentsData);
+      
+      // Función para ordenar comentarios recursivamente (más reciente primero)
+      const sortCommentsRecursively = (comments) => {
+        comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
+        // Ordenar hijos recursivamente
+        comments.forEach(comment => {
+          if (comment.children && comment.children.length > 0) {
+            comment.children = sortCommentsRecursively([...comment.children]);
+          }
+        });
+        
+        return comments;
+      };
+      
+      const sortedComments = sortCommentsRecursively([...commentsData]);
+      setComments(sortedComments);
       setError(null);
     } catch (err) {
       console.error("Error loading comments:", err);
@@ -65,20 +82,58 @@ const Comment = ({ post_id, refresh }) => {
     setEditedText("");
   };
 
+  // Función recursiva para actualizar un comentario en cualquier nivel del árbol
+  const updateCommentInTree = (commentsList, commentId, updatedData) => {
+    return commentsList.map(comment => {
+      if (comment._id === commentId) {
+        // Si updatedData es una función, la ejecutamos pasando el comentario actual
+        if (typeof updatedData === 'function') {
+          // Preservamos los hijos del comentario original
+          const updatedComment = updatedData(comment);
+          return { 
+            ...comment, 
+            ...updatedComment,
+            // Aseguramos que los hijos se mantengan
+            children: comment.children 
+          };
+        }
+        // Si es un objeto, simplemente lo mezclamos pero conservamos los hijos
+        return { 
+          ...comment, 
+          ...updatedData,
+          children: comment.children 
+        };
+      }
+      
+      if (comment.children && comment.children.length > 0) {
+        return {
+          ...comment,
+          children: updateCommentInTree(comment.children, commentId, updatedData)
+        };
+      }
+      
+      return comment;
+    });
+  };
+
   const submitEdit = async (commentId) => {
     if (!commentId) return;
     setIsSubmitting(true);
 
     try {
-      await axios.put(
+      const response = await axios.put(
         `${domain}updateComment/${commentId}`,
         { text: editedText },
         { withCredentials: true }
       );
 
-      setComments(comments.map(comment =>
-        comment._id === commentId ? { ...comment, text: editedText, edited: true } : comment
-      ));
+      // Actualiza el comentario en cualquier nivel del árbol
+      const updatedComments = updateCommentInTree(comments, commentId, {
+        text: editedText,
+        edited: true
+      });
+      
+      setComments(updatedComments);
       setEditingComment(null);
       setEditedText("");
 
@@ -125,7 +180,22 @@ const Comment = ({ post_id, refresh }) => {
     try {
       await axios.delete(`${domain}deleteComment/${commentId}`, { withCredentials: true });
 
-      setComments(comments.filter(comment => comment._id !== commentId));
+      // Eliminar comentario de cualquier nivel del árbol
+      const filterCommentsRecursively = (commentsList, idToRemove) => {
+        return commentsList
+          .filter(comment => comment._id !== idToRemove)
+          .map(comment => {
+            if (comment.children && comment.children.length > 0) {
+              return {
+                ...comment,
+                children: filterCommentsRecursively(comment.children, idToRemove)
+              };
+            }
+            return comment;
+          });
+      };
+
+      setComments(filterCommentsRecursively(comments, commentId));
 
       Swal.fire({
         icon: "success",
@@ -151,33 +221,75 @@ const Comment = ({ post_id, refresh }) => {
   };
 
   const handleLike = async (commentId) => {
+    // Evitar múltiples clics mientras se procesa una acción
+    if (pendingLikeActions[commentId]) return;
+    
     try {
+      // Marcar esta acción como pendiente
+      setPendingLikeActions(prev => ({ ...prev, [commentId]: true }));
+      
+      // Actualizar inmediatamente para UI optimista
+      const updatedComments = updateCommentInTree([...comments], commentId, comment => {
+        const userLikedIndex = comment.likedBy?.indexOf(user_id) ?? -1;
+        const userDislikedIndex = comment.dislikedBy?.indexOf(user_id) ?? -1;
+        
+        let likedBy = [...(comment.likedBy || [])];
+        let dislikedBy = [...(comment.dislikedBy || [])];
+        let likes = comment.likes || 0;
+        let dislikes = comment.dislikes || 0;
+        
+        // Si ya dio like, quitar el like
+        if (userLikedIndex !== -1) {
+          likedBy.splice(userLikedIndex, 1);
+          likes--;
+        } else {
+          // Si no, añadir like
+          likedBy.push(user_id);
+          likes++;
+          
+          // Si había dado dislike antes, quitar el dislike
+          if (userDislikedIndex !== -1) {
+            dislikedBy.splice(userDislikedIndex, 1);
+            dislikes--;
+          }
+        }
+        
+        return {
+          likedBy,
+          dislikedBy,
+          likes,
+          dislikes
+        };
+      });
+      
+      // Actualizar el estado con la versión optimista
+      setComments(updatedComments);
+      
+      // Realizar la acción real en el servidor
       const response = await axios.put(
         `${domain}likeComment/${commentId}`, 
         {}, 
         { withCredentials: true }
       );
       
-      // Update the comment in our state
-      setComments(comments.map(comment => 
-        comment._id === commentId ? response.data.comment : comment
-      ));
-
-      // Also update any child comments that might match this ID
-      setComments(comments.map(comment => {
-        if (comment.children && comment.children.length > 0) {
-          return {
-            ...comment,
-            children: comment.children.map(child => 
-              child._id === commentId ? response.data.comment : child
-            )
+      // Actualizar con la respuesta del servidor para asegurar consistencia
+      if (response.data && response.data.comment) {
+        // Preservar los hijos al actualizar con los datos del servidor
+        const serverUpdatedComments = updateCommentInTree([...comments], commentId, comment => {
+          // Mantén los hijos del comentario original
+          return { 
+            ...response.data.comment,
+            children: comment.children 
           };
-        }
-        return comment;
-      }));
-
+        });
+        setComments(serverUpdatedComments);
+      }
+      
     } catch (err) {
       console.error("Error liking comment:", err);
+      // En caso de error, revertir al estado original recargando los comentarios
+      fetchComments();
+      
       Swal.fire({
         icon: "error",
         title: "Failed to like comment",
@@ -186,37 +298,82 @@ const Comment = ({ post_id, refresh }) => {
         color: "#ffa500",
         confirmButtonColor: "#ffa500"
       });
+    } finally {
+      // Marcar la acción como completada
+      setPendingLikeActions(prev => ({ ...prev, [commentId]: false }));
     }
   };
 
   const handleDislike = async (commentId) => {
+    // Evitar múltiples clics mientras se procesa una acción
+    if (pendingLikeActions[commentId]) return;
+    
     try {
+      // Marcar esta acción como pendiente
+      setPendingLikeActions(prev => ({ ...prev, [commentId]: true }));
+      
+      // Actualizar inmediatamente para UI optimista
+      const updatedComments = updateCommentInTree([...comments], commentId, comment => {
+        const userLikedIndex = comment.likedBy?.indexOf(user_id) ?? -1;
+        const userDislikedIndex = comment.dislikedBy?.indexOf(user_id) ?? -1;
+        
+        let likedBy = [...(comment.likedBy || [])];
+        let dislikedBy = [...(comment.dislikedBy || [])];
+        let likes = comment.likes || 0;
+        let dislikes = comment.dislikes || 0;
+        
+        // Si ya dio dislike, quitar el dislike
+        if (userDislikedIndex !== -1) {
+          dislikedBy.splice(userDislikedIndex, 1);
+          dislikes--;
+        } else {
+          // Si no, añadir dislike
+          dislikedBy.push(user_id);
+          dislikes++;
+          
+          // Si había dado like antes, quitar el like
+          if (userLikedIndex !== -1) {
+            likedBy.splice(userLikedIndex, 1);
+            likes--;
+          }
+        }
+        
+        return {
+          likedBy,
+          dislikedBy,
+          likes,
+          dislikes
+        };
+      });
+      
+      // Actualizar el estado con la versión optimista
+      setComments(updatedComments);
+      
+      // Realizar la acción real en el servidor
       const response = await axios.put(
         `${domain}dislikeComment/${commentId}`, 
         {}, 
         { withCredentials: true }
       );
       
-      // Update the comment in our state
-      setComments(comments.map(comment => 
-        comment._id === commentId ? response.data.comment : comment
-      ));
-
-      // Also update any child comments that might match this ID
-      setComments(comments.map(comment => {
-        if (comment.children && comment.children.length > 0) {
-          return {
-            ...comment,
-            children: comment.children.map(child => 
-              child._id === commentId ? response.data.comment : child
-            )
+      // Actualizar con la respuesta del servidor para asegurar consistencia
+      if (response.data && response.data.comment) {
+        // Preservar los hijos al actualizar con los datos del servidor
+        const serverUpdatedComments = updateCommentInTree([...comments], commentId, comment => {
+          // Mantén los hijos del comentario original
+          return { 
+            ...response.data.comment,
+            children: comment.children 
           };
-        }
-        return comment;
-      }));
-
+        });
+        setComments(serverUpdatedComments);
+      }
+      
     } catch (err) {
       console.error("Error disliking comment:", err);
+      // En caso de error, revertir al estado original recargando los comentarios
+      fetchComments();
+      
       Swal.fire({
         icon: "error",
         title: "Failed to dislike comment",
@@ -225,6 +382,9 @@ const Comment = ({ post_id, refresh }) => {
         color: "#ffa500",
         confirmButtonColor: "#ffa500"
       });
+    } finally {
+      // Marcar la acción como completada
+      setPendingLikeActions(prev => ({ ...prev, [commentId]: false }));
     }
   };
 
@@ -235,6 +395,7 @@ const Comment = ({ post_id, refresh }) => {
       // Check if the current user has liked/disliked this comment
       const userHasLiked = comment.likedBy?.includes(user_id);
       const userHasDisliked = comment.dislikedBy?.includes(user_id);
+      const isLikeActionPending = pendingLikeActions[comment._id];
       
       return (
         <div key={comment._id} className={`${isChild ? 'bg-zinc-800' : 'bg-zinc-900'} rounded-lg p-4 border border-zinc-800 hover:border-zinc-700 transition-colors ${isChild ? 'mt-3' : ''}`}>
@@ -292,16 +453,49 @@ const Comment = ({ post_id, refresh }) => {
               <div className="flex items-center mt-3 text-zinc-500 text-sm">
                 <button 
                   onClick={() => handleLike(comment._id)} 
-                  className={`flex items-center hover:text-orange-400 transition mr-4 ${userHasLiked ? 'text-orange-400' : ''}`}
+                  disabled={isLikeActionPending}
+                  className={`flex items-center hover:text-orange-400 transition mr-4 ${userHasLiked ? 'text-orange-400 font-medium' : ''} ${isLikeActionPending ? 'opacity-50' : ''}`}
                 >
-                  <ThumbsUp size={14} className="mr-1" />
+                  {/* SVG DIRECTAMENTE PARA THUMBS UP */}
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="14" 
+                    height="14" 
+                    viewBox="0 0 24 24" 
+                    className="mr-1"
+                    fill={userHasLiked ? "currentColor" : "none"}
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <path d="M7 10v12" />
+                    <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z" />
+                  </svg>
                   <span>{comment.likes || 0}</span>
                 </button>
+
                 <button 
                   onClick={() => handleDislike(comment._id)} 
-                  className={`flex items-center hover:text-orange-300 transition mr-4 ${userHasDisliked ? 'text-orange-300' : ''}`}
+                  disabled={isLikeActionPending}
+                  className={`flex items-center hover:text-orange-300 transition mr-4 ${userHasDisliked ? 'text-orange-300 font-medium' : ''} ${isLikeActionPending ? 'opacity-50' : ''}`}
                 >
-                  <ThumbsDown size={14} className="mr-1" />
+                  {/* SVG DIRECTAMENTE PARA THUMBS DOWN */}
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="14" 
+                    height="14" 
+                    viewBox="0 0 24 24" 
+                    className="mr-1"
+                    fill={userHasDisliked ? "currentColor" : "none"}
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <path d="M17 14V2" />
+                    <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z" />
+                  </svg>
                   <span>{comment.dislikes || 0}</span>
                 </button>
 
