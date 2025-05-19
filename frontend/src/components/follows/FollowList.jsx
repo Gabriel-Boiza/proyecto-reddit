@@ -30,13 +30,18 @@ const FollowList = () => {
         {followedUsers.map(user => (
           <FollowedUser 
             key={user.id}
-            avatar={domain+"uploads/"+user.profileImage}
+            avatar={
+              user.profileImage
+                ? domain + "uploads/" + user.profileImage
+                : "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
+            }
             username={user.username}
             fullName={user.fullName}
             userId={user.id}
           />
         ))}
       </div>
+
     </Card>
   );
 };

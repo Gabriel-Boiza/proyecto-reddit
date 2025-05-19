@@ -57,7 +57,6 @@ function Post({ post }) {
   };
 
   useEffect(() => {
-    console.log(username)
     if (!isAuth) return;
     axios
       .post(`${domain}getVoteState`, { post_id: post._id }, { withCredentials: true })

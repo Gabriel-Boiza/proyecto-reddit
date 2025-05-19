@@ -83,15 +83,16 @@ const PostList = ({ posts, onDelete, isOwner }) => {
                     </button>
                   </div>
                 )}
+                {post?.file_url && (
                 <img
                   src={
-                    post.file_url
-                      ? `${domain}uploads/${post.file_url}`
-                      : "https://via.placeholder.com/150"
+                      `${domain}uploads/${post.file_url}`
                   }
                   alt={post.title}
                   className="w-18 h-18 rounded-md mb-2 float-left mr-2"
                 />
+                )}
+
                 <h3 className="text-xl text-[#B7CAD4] font-semibold">{post.title}</h3>
                 <p className="text-gray-400">{post.description}</p>
               </div>

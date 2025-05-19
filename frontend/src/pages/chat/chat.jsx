@@ -53,7 +53,6 @@ const ChatFullPage = () => {
 
     const getMessages = async () => {
         const response = await axios.get(`${domain}getChatHistory/${otherUser.id}`, {withCredentials: true})
-        console.log(response.data.chats)
         setMessages(response.data.chats)
     }
     

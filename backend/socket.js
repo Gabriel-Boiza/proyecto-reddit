@@ -3,12 +3,9 @@ const connectedUsers = new Map();
 
 export default function configureSockets(io) {
   io.on('connection', socket => {
-    console.log(`Usuario conectado: ${socket.id}`);
 
     socket.on("register", ({ currentUserId, otherUserId }) => {
-      console.log(`Usuario ${currentUserId} registrado, quiere hablar con ${otherUserId}`);
       connectedUsers.set(currentUserId, { socketID: socket.id, sendTo: otherUserId });
-      console.log("Usuarios conectados:", Array.from(connectedUsers.entries()));
     });
 
     socket.on("message", async (messageContent) => {
@@ -23,7 +20,6 @@ export default function configureSockets(io) {
         }
 
         if (!senderUserId) {
-          console.log("Error: No se pudo identificar al remitente");
           return;
         }
 
@@ -75,7 +71,6 @@ export default function configureSockets(io) {
           break;
         }
       }
-      console.log("Usuarios conectados tras desconexión:", Array.from(connectedUsers.entries()));
     });
   });
 }

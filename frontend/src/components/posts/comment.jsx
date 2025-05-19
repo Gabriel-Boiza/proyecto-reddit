@@ -24,7 +24,6 @@ const Comment = ({ post_id, refresh }) => {
     try {
       setIsLoading(true);
       const response = await axios.get(`${domain}getCommentsByPost/${post_id}`);
-      console.log("Comments data:", response.data);
       const commentsData = response.data.comments || [];
       
       // Función para ordenar comentarios recursivamente (más reciente primero)
