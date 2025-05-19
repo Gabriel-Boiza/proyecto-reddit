@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 
 
-// Consultar todos los mensajes entre dos usuarios específicos
 export const getChatHistory = async (req, res) => {
     const user_id = req.user.id;
     const otherUser_id = req.params.id;
@@ -18,6 +17,7 @@ export const getChatHistory = async (req, res) => {
 
     res.json({ chats: filteredChats });
 };
+
 
 
 export const getFollowedUsers = async (req, res) => {

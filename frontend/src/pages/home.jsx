@@ -9,13 +9,12 @@ import { useAuth } from "../context/authContext";
 
 function Home() {
   const [posts, setPosts] = useState([]);
+  const { isAuth } = useAuth();
 
-  const {isAuth} = useAuth()
-  
   useEffect(() => {
     postsData();
   }, []);
-  
+
   const postsData = async () => {
     try {
       const response = await axios.get(`${domain}getAllPosts`, {
@@ -26,32 +25,31 @@ function Home() {
       console.error("Error fetching posts:", error);
     }
   };
-  
-  return (
-    <>
-      <Header />
-      <div className="flex">
-        <Aside />
-        <div className="flex-1 flex justify-center">
-          {/* Contenedor principal con flex para posts y followList */}
-          <div className="flex max-w-6xl w-full gap-6 px-4">
-            {/* Columna izquierda para posts */}
-            <div className="flex-1 max-w-4xl space-y-6 py-6">
-              {posts.map((post) => (
-                <Post key={post._id} post={post} />
-              ))}
-            </div>
-            
-            {isAuth && (
-              <div className="w-72 py-6 sticky top-16 h-fit">
-              <FollowList />
-              </div>
-            )}
+
+return (
+  <>
+    <Header />
+    <Aside />
+    <div className="flex justify-center">
+      <div className="w-full sm:pl-80">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-2 sm:px-4">
+          {/* Columna 2/3 para posts */}
+          <div className="md:col-span-2 space-y-6 py-6">
+            {posts.map((post) => (
+              <Post key={post._id} post={post} />
+            ))}
           </div>
+          {/* Columna 1/3 para FollowList (si está autenticado) */}
+          {isAuth && (
+            <div className="py-6 sticky top-16 h-fit hidden md:block">
+              <FollowList />
+            </div>
+          )}
         </div>
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 }
 
 export default Home;

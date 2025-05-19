@@ -8,7 +8,7 @@ import { ArrowLeft, Send, User, Phone, Video, Info, MoreHorizontal } from "lucid
 
 const socket = io(domain);
 
-const ChatFullPage = () => {
+const Chat = () => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
     const { user_id } = useAuth();
@@ -214,4 +214,4 @@ const ChatFullPage = () => {
     );
 }
 
-export default ChatFullPage;
+export default Chat;

@@ -280,181 +280,182 @@ function Profile({isOwner}) {
         <>
             <Header />
             <Aside />
-            <div className="flex">
-                <main className="content grid grid-cols-[5fr_2fr] gap-6 mx-auto p-4 ml-80 w-[100%]">
-                    <section className="flex flex-col w-[100%]">
-                        <div className="flex px-12 gap-6 items-center">
-                            <img
-                                className="w-18 h-18 rounded-full"
-                                src={
-                                    user.profileImage
-                                    ? `${domain}uploads/${user.profileImage}`
-                                    : "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
-                                }
-                                onError={(e) => {
-                                    e.target.onerror = null; // evita bucle infinito si falla la imagen por defecto
-                                    e.target.src = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png";
-                                }}
-                                alt=""
-                            />
-                            <div className="flex flex-col gap-1">
-                                <h2 className="text-3xl font-bold text-[#B7CAD4]">{user.username}</h2>
-                                <h2 className="text-lg text-[#8BA2AD]">{user.name}</h2>
-                            </div>
-                            
-                            {!isOwner && isAuth && (
-                                <div className="ml-auto flex gap-3">
-                                    <button 
-                                        onClick={handleMessageUser}
-                                        className="px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 
-                                            bg-green-600 hover:bg-green-700 text-white"
-                                    >
-                                        <MessageSquare size={18} />
-                                        <span>Message</span>
-                                    </button>
-                                    
-                                    <button 
-                                        onClick={handleFollowAccount}
-                                        className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 ${
-                                            isFollowing 
-                                            ? 'bg-gray-700 hover:bg-red-700 text-white' 
-                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
-                                        }`}
-                                    >
-                                        {isFollowing ? (
-                                            <>
-                                                <UserMinus size={18} />
-                                                <span>Unfollow</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <UserPlus size={18} />
-                                                <span>Follow</span>
-                                            </>
-                                        )}
-                                    </button>
+            <div className="flex flex-col md:flex-row">
+                <main className="content w-full p-4 md:ml-80">
+                    <div className="grid grid-cols-1 lg:grid-cols-[5fr_2fr] gap-6">
+                        <section className="flex flex-col w-full">
+                            <div className="flex flex-col md:flex-row px-4 md:px-12 gap-6 items-start md:items-center">
+                                <img
+                                    className="w-20 h-20 md:w-18 md:h-18 rounded-full"
+                                    src={
+                                        user.profileImage
+                                        ? `${domain}uploads/${user.profileImage}`
+                                        : "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png"
+                                    }
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_5.png";
+                                    }}
+                                    alt=""
+                                />
+                                <div className="flex flex-col gap-1">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-[#B7CAD4]">{user.username}</h2>
+                                    <h2 className="text-md md:text-lg text-[#8BA2AD]">{user.name}</h2>
                                 </div>
-                            )}
-                        </div>
-
-                        <Tab.Group className="w-[100%]">
-                            <Tab.List className="relative flex space-x-4 mt-6 bg-gray-800 p-1 rounded-lg">
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                    
-                                >
-                                    Posts
-                                </Tab>
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                    
-                                >
-                                    Upvoted
-                                </Tab>
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                    
-                                >
-                                    Downvoted
-                                </Tab>
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                    
-                                >
-                                    Comments
-                                </Tab>
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                >
-                                    <div className="flex items-center gap-1">
-                                        <Users size={14} />
-                                        <span>Followers</span>
-                                    </div>
-                                </Tab>
-                                <Tab
-                                    className={({ selected }) =>
-                                        `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
-                                        ${selected
-                                        ? 'bg-blue-600 text-white shadow-md'
-                                        : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
-                                    }
-                                >
-                                    <div className="flex items-center gap-1">
-                                        <UserCheck size={14} />
-                                        <span>Following</span>
-                                    </div>
-                                </Tab>
-                            </Tab.List>
-
-                            <Tab.Panels className="mt-4 max-h-[650px] overflow-y-auto pr-2 scrollPosts">
                                 
-                                <Tab.Panel>
-                                    <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <PostList posts={posts} onDelete={handleDeletePost} isOwner={isOwner} />
+                                {!isOwner && isAuth && (
+                                    <div className="flex flex-col md:flex-row gap-3 mt-4 md:mt-0 md:ml-auto w-full md:w-auto">
+                                        <button 
+                                            onClick={handleMessageUser}
+                                            className="w-full md:w-auto px-4 py-2 rounded-full flex items-center justify-center gap-2 transition-all duration-300 
+                                                bg-green-600 hover:bg-green-700 text-white"
+                                        >
+                                            <MessageSquare size={18} />
+                                            <span>Message</span>
+                                        </button>
+                                        
+                                        <button 
+                                            onClick={handleFollowAccount}
+                                            className={`w-full md:w-auto px-4 py-2 rounded-full flex items-center justify-center gap-2 transition-all duration-300 ${
+                                                isFollowing 
+                                                ? 'bg-gray-700 hover:bg-red-700 text-white' 
+                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                            }`}
+                                        >
+                                            {isFollowing ? (
+                                                <>
+                                                    <UserMinus size={18} />
+                                                    <span>Unfollow</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <UserPlus size={18} />
+                                                    <span>Follow</span>
+                                                </>
+                                            )}
+                                        </button>
                                     </div>
-                                </Tab.Panel>
+                                )}
+                            </div>
 
-                                <Tab.Panel>
-                                    <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <UpvotedPostList upvotedPosts={upvotedPosts} />
-                                    </div>
-                                </Tab.Panel>
+                            <Tab.Group className="w-full">
+                                <Tab.List className="relative flex overflow-x-auto space-x-2 md:space-x-4 mt-6 bg-gray-800 p-1 rounded-lg no-scrollbar">
+                                    <Tab
+                                        className={({ selected }) =>
+                                            `relative z-10 py-2 px-3 md:px-4 text-xs md:text-sm font-medium rounded-md transition-all duration-300 outline-none whitespace-nowrap
+                                            ${selected
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                                        }
+                                    >
+                                        Posts
+                                    </Tab>
+                                    <Tab
+                                        className={({ selected }) =>
+                                            `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
+                                            ${selected
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                                        }
+                                        
+                                    >
+                                        Upvoted
+                                    </Tab>
+                                    <Tab
+                                        className={({ selected }) =>
+                                            `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
+                                            ${selected
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                                        }
+                                        
+                                    >
+                                        Downvoted
+                                    </Tab>
+                                    <Tab
+                                        className={({ selected }) =>
+                                            `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
+                                            ${selected
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                                        }
+                                        
+                                    >
+                                        Comments
+                                    </Tab>
+                                    <Tab
+                                        className={({ selected }) =>
+                                            `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
+                                            ${selected
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                                        }
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            <Users size={14} />
+                                            <span>Followers</span>
+                                        </div>
+                                    </Tab>
+                                    <Tab
+                                        className={({ selected }) =>
+                                            `relative z-10 py-2 px-4 text-sm font-medium rounded-md transition-all duration-300 outline-none
+                                            ${selected
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                                        }
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            <UserCheck size={14} />
+                                            <span>Following</span>
+                                        </div>
+                                    </Tab>
+                                </Tab.List>
 
-                                <Tab.Panel>
-                                    <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <DownvotedPostList downvotedPosts={downvotedPosts} />
-                                    </div>
-                                </Tab.Panel>
-                                
-                                <Tab.Panel>
-                                    <CommentedPostList comments={comments} />
-                                </Tab.Panel>
+                                <Tab.Panels className="mt-4 max-h-[650px] overflow-y-auto pr-2 scrollPosts">
+                                    
+                                    <Tab.Panel>
+                                        <div className="max-h-[600px] overflow-y-auto pr-2">
+                                            <PostList posts={posts} onDelete={handleDeletePost} isOwner={isOwner} />
+                                        </div>
+                                    </Tab.Panel>
 
-                                <Tab.Panel>
-                                    <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <FollowersList followers={followers} />
-                                    </div>
-                                </Tab.Panel>
+                                    <Tab.Panel>
+                                        <div className="max-h-[600px] overflow-y-auto pr-2">
+                                            <UpvotedPostList upvotedPosts={upvotedPosts} />
+                                        </div>
+                                    </Tab.Panel>
 
-                                <Tab.Panel>
-                                    <div className="max-h-[600px] overflow-y-auto pr-2">
-                                        <FollowingList following={following} />
-                                    </div>
-                                </Tab.Panel>
+                                    <Tab.Panel>
+                                        <div className="max-h-[600px] overflow-y-auto pr-2">
+                                            <DownvotedPostList downvotedPosts={downvotedPosts} />
+                                        </div>
+                                    </Tab.Panel>
+                                    
+                                    <Tab.Panel>
+                                        <CommentedPostList comments={comments} />
+                                    </Tab.Panel>
 
-                            </Tab.Panels>
-                        </Tab.Group>
-                    </section>
+                                    <Tab.Panel>
+                                        <div className="max-h-[600px] overflow-y-auto pr-2">
+                                            <FollowersList followers={followers} />
+                                        </div>
+                                    </Tab.Panel>
 
-                    <article className="p-10 max-h-[620px] w-[300px]  rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)]">
-                        <ProfileCard user={user} isOwner={isOwner} deleteAccount={deleteAccount} />
-                    </article>
-                    
+                                    <Tab.Panel>
+                                        <div className="max-h-[600px] overflow-y-auto pr-2">
+                                            <FollowingList following={following} />
+                                        </div>
+                                    </Tab.Panel>
+
+                                </Tab.Panels>
+                            </Tab.Group>
+                        </section>
+
+                        <article className="p-6 md:p-10 max-h-[620px] w-full lg:w-[300px] rounded-[10px] bg-[linear-gradient(to_bottom,_#1e3a8a,_#000_20%)] mt-6 lg:mt-0">
+                            <ProfileCard user={user} isOwner={isOwner} deleteAccount={deleteAccount} />
+                        </article>
+                        
+                    </div>
                 </main>
             </div>
 

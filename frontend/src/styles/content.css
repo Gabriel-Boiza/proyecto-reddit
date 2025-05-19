@@ -1,0 +1,29 @@
+@layer utilities {
+    .content {
+        @media (min-width: 768px) {
+            margin-left: 20rem;
+        }
+    }
+    
+    .scrollPosts::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .scrollPosts::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .scrollPosts::-webkit-scrollbar-thumb {
+        background-color: #4B5563;
+        border-radius: 4px;
+    }
+    
+    .scrollPosts::-webkit-scrollbar-thumb:hover {
+        background-color: #6B7280;
+    }
+    
+    .scrollPosts {
+        scrollbar-width: thin;
+        scrollbar-color: #4B5563 transparent;
+    }
+}

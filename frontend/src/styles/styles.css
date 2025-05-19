@@ -1,14 +1,14 @@
 @import "tailwindcss";
-@import "./aside.css";
 @import "./header.css";
 @import "./login.css";
 @import "./profilePosts.css";
+@import "./profileTabs.css";
+@import "./content.css";
 
 body {
     background-color: #14181a;
-    color: #f0f0f0; /* Texto claro en el modo oscuro */
-
+    color: #f0f0f0;
 }
 
-  
+
 

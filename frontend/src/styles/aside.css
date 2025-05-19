@@ -1,7 +1,13 @@
 @import "tailwindcss";
 
 .aside {
-  @apply hidden sm:block sm:fixed sm:left-0 sm:w-80 sm:text-white sm:max-h-screen sm:overflow-y-auto sm:p-6 sm:border-r sm:border-[#3E4042] sm:bg-[#14181a];
+  @apply fixed left-0 w-80 text-white max-h-screen overflow-y-auto p-6 border-r border-[#3E4042] bg-[#14181a];
+  @apply -translate-x-full transition-transform duration-300;
+  @apply sm:translate-x-0 sm:block;
+}
+
+.aside.open {
+  @apply translate-x-0;
 }
 
 .aside-links {
@@ -18,24 +24,22 @@
 
 .aside::-webkit-scrollbar {
     width: 6px;
-  }
+}
   
-  .aside::-webkit-scrollbar-track {
+.aside::-webkit-scrollbar-track {
     background: transparent;
-  }
+}
   
-  .aside::-webkit-scrollbar-thumb {
-    background-color: #4B5563; /* Gris suave (puedes cambiarlo) */
+.aside::-webkit-scrollbar-thumb {
+    background-color: #4B5563;
     border-radius: 4px;
-  }
+}
   
-  .aside::-webkit-scrollbar-thumb:hover {
-    background-color: #6B7280; /* Gris más claro al pasar el mouse */
-  }
+.aside::-webkit-scrollbar-thumb:hover {
+    background-color: #6B7280;
+}
   
-  /* Firefox */
-  .aside {
+.aside {
     scrollbar-width: thin;
     scrollbar-color: #4B5563 transparent;
-  }
-  
+}
