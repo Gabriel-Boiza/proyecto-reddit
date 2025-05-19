@@ -36,7 +36,7 @@ function ViewPost() {
             <div className="flex pt-16 max-w-6xl mx-auto">
                 <Aside />
                 <main className="flex justify-center items-start w-full p-4">
-                    <div className="w-full max-w-2xl">
+                    <div className="w-full max-w-3xl">
                         {post ? (
                             <>
                                 <Post post={post} />
