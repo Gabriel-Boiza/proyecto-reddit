@@ -11,6 +11,8 @@ route.get("/getUserById/:id", UserController.getUserById)
 route.get("/getUserByUsername/:username", UserController.getUserByUsername)
 route.get("/getUserByCookie", auth.verifyToken, UserController.getUserByCookie)
 
+route.get("/getChatHistory/:id", auth.verifyToken, UserController.getChatHistory)
+
 route.get("/getUserInteractions", auth.verifyToken, UserController.getUserInteractions);
 route.get("/getUserInteractionsByUsername/:username", UserController.getUserInterectionsByUsername);
 

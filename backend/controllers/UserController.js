@@ -1,8 +1,18 @@
 import User from "../models/User.js"
-import Comment from "../models/Comment.js";
 import Post from "../models/Post.js";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
+
+
+// Consultar todos los mensajes entre dos usuarios específicos
+export const getChatHistory = async (req, res) => {
+    const user_id = req.user.id
+    const otherUser_id = req.params.id
+    const user = await User.findById(user_id)
+    const chats = user.chats
+    chats.filter(chat => (chat.from == user_id && chat.to == otherUser_id) || (chat.from == otherUser_id && chat.to == user_id))
+    res.json({chats: chats});
+}
 
 export const getFollowedUsers = async (req, res) => {
     const user_id = req.user.id

@@ -11,6 +11,12 @@ const userSchema = new mongoose.Schema(
     profileImage: { type: String },
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+    chats: [{
+      content: { type: String, required: true },
+      from: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+      to: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+      timestamp: { type: Date, default: Date.now }
+    }]
   },
   {
     timestamps: true,

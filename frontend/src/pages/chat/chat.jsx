@@ -39,7 +39,7 @@ const ChatFullPage = () => {
         setIsConnected(true);
         setLoading(false);
         
-        loadMockMessages(); // Simulación para la UI
+        getMessages()
         
     }, [otherUser, myUser]);
 
@@ -51,37 +51,11 @@ const ChatFullPage = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    const loadMockMessages = () => {
-        const mockHistory = [
-            {
-                content: "Hola, ¿cómo estás?",
-                from: user_id,
-                timestamp: new Date(Date.now() - 100000).toISOString()
-            },
-            {
-                content: "¡Muy bien! ¿Y tú?",
-                from: otherUser.id,
-                timestamp: new Date(Date.now() - 90000).toISOString()
-            },
-            {
-                content: "Todo bien, estaba revisando ese post que subiste ayer",
-                from: user_id,
-                timestamp: new Date(Date.now() - 80000).toISOString()
-            },
-            {
-                content: "¿Te pareció interesante?",
-                from: otherUser.id,
-                timestamp: new Date(Date.now() - 70000).toISOString()
-            },
-            {
-                content: "Sí, especialmente la parte sobre React hooks",
-                from: user_id,
-                timestamp: new Date(Date.now() - 60000).toISOString()
-            }
-        ];
-        
-        setMessages(mockHistory);
-    };
+    const getMessages = async () => {
+        const response = await axios.get(`${domain}getChatHistory/${otherUser.id}`, {withCredentials: true})
+        console.log(response.data.chats)
+        setMessages(response.data.chats)
+    }
     
     const getOtherUser = async () => {
         try {
@@ -113,6 +87,7 @@ const ChatFullPage = () => {
         const newMessage = {
             content: message,
             from: user_id,
+            to: otherUser.id,
             timestamp: new Date().toISOString()
         };
         
