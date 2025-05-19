@@ -27,28 +27,30 @@ function Home() {
   };
 
 return (
-  <>
+  <div className="min-h-screen bg-[#14181a]">
     <Header />
-    <Aside />
-    <div className="flex justify-center">
-      <div className="w-full sm:pl-80">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-2 sm:px-4">
-          {/* Columna 2/3 para posts */}
-          <div className="md:col-span-2 space-y-6 py-6">
-            {posts.map((post) => (
-              <Post key={post._id} post={post} />
-            ))}
-          </div>
-          {/* Columna 1/3 para FollowList (si está autenticado) */}
-          {isAuth && (
-            <div className="py-6 sticky top-16 h-fit hidden md:block">
-              <FollowList />
+    <div className="pt-16"> {/* Add padding-top to account for fixed header */}
+      <Aside />
+      <div className="flex justify-center">
+        <div className="w-full md:pl-80">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
+            {/* Main content column for posts */}
+            <div className="md:col-span-2 space-y-6 py-6">
+              {posts.map((post) => (
+                <Post key={post._id} post={post} />
+              ))}
             </div>
-          )}
+            {/* FollowList column */}
+            {isAuth && (
+              <div className="py-6 sticky top-20 h-fit hidden md:block">
+                <FollowList />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </>
+  </div>
 );
 }
 

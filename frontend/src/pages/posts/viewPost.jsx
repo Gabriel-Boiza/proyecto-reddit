@@ -32,22 +32,25 @@ function ViewPost(){
     };
 
     return (
-        <>
+        <div className="min-h-screen bg-[#14181a]">
             <Header />
-            <Aside />
-            <div className="p-6 max-w-4xl mx-auto space-y-6">
-                {post ? (
-                    <>
-                        <Post post={post} />
-                        <Comment post_id={id} refresh={refreshComments} />
-                    </>
-                ) : (
-                    <p>Cargando post...</p>
-                )}
+            <div className="pt-16"> {/* Add padding-top for fixed header */}
+                <Aside />
+                <div className="flex">
+                    <main className="content w-full p-4 md:ml-80">
+                        {post ? (
+                            <>
+                                <Post post={post} />
+                                <Comment post_id={id} refresh={refreshComments} />
+                            </>
+                        ) : (
+                            <p>Cargando post...</p>
+                        )}
+                    </main>
+                </div>
             </div>
-        </>
+        </div>
     );
 }
-
 
 export default ViewPost

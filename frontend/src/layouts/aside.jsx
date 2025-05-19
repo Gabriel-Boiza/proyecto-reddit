@@ -29,42 +29,44 @@ function Aside() {
 
   return (
     <>
-      <div className="flex">
-        <aside className={`fixed left-0 w-80 text-white max-h-screen overflow-y-auto p-6 border-r border-[#3E4042] bg-[#14181a] 
-          transform transition-transform duration-300 ease-in-out z-50
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
-          <nav className="flex flex-col gap-2 border-b border-[#26282A] pb-2 mb-4">
-            <p className="text-[#637d84]">TOPICS</p>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Games</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Internet Culture (Viral)</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Q&As</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Technology</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Pop Culture</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Movies & TV</a>
-          </nav>
-          <nav className="flex flex-col gap-2 border-b border-[#26282A] pb-2 mb-4">
-            <p className="text-[#637d84]">RESOURCES</p>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">About Reddix</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Advertise</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Help</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Blog</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Careers</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Press</a>
-          </nav>
-          <nav className="flex flex-col gap-2">
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Communities</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Best of Reddix</a>
-            <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Topics</a>
-          </nav>
-          
-          {isOpen && (
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" 
-              onClick={() => setIsOpen(false)}
-            />
-          )}
-        </aside>
-      </div>
+      {/* Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <aside 
+        className={`fixed top-16 left-0 w-80 h-[calc(100vh-4rem)] text-white overflow-y-auto p-6 border-r border-[#3E4042] bg-[#14181a] 
+          transform transition-transform duration-300 ease-in-out z-30
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+      >
+        <nav className="flex flex-col gap-2 border-b border-[#26282A] pb-2 mb-4">
+          <p className="text-[#637d84]">TOPICS</p>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Games</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Internet Culture (Viral)</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Q&As</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Technology</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Pop Culture</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Movies & TV</a>
+        </nav>
+        <nav className="flex flex-col gap-2 border-b border-[#26282A] pb-2 mb-4">
+          <p className="text-[#637d84]">RESOURCES</p>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">About Reddix</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Advertise</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Help</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Blog</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Careers</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Press</a>
+        </nav>
+        <nav className="flex flex-col gap-2">
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Communities</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Best of Reddix</a>
+          <a href="#" className="hover:bg-[#1c2224] px-4 py-2 rounded text-white cursor-pointer transition-colors duration-200">Topics</a>
+        </nav>
+      </aside>
     </>
   );
 }
