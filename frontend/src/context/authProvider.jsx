@@ -17,6 +17,7 @@ const AuthProvider = ({ children }) => {
             setIsAuth(true);
             setMessage("Login successful");
             setIsError(false);  
+            window.location.href = "/"
             return true
         } catch (error) {
             setIsAuth(false);
