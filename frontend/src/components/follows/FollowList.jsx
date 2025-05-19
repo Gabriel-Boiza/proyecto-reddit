@@ -30,7 +30,7 @@ const FollowList = () => {
         {followedUsers.map(user => (
           <FollowedUser 
             key={user.id}
-            avatar={user.avatar}
+            avatar={domain+"uploads/"+user.profileImage}
             username={user.username}
             fullName={user.fullName}
             userId={user.id}
