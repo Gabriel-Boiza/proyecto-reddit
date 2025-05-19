@@ -17,15 +17,17 @@ function Aside() {
 
   useEffect(() => {
     const button = document.getElementById('botonDesplegableAside');
+    const toggle = () => setIsOpen(prev => !prev);
+    
     if (button) {
-      button.addEventListener('click', () => setIsOpen(!isOpen));
+      button.addEventListener('click', toggle);
     }
     return () => {
       if (button) {
-        button.removeEventListener('click', () => setIsOpen(!isOpen));
+        button.removeEventListener('click', toggle);
       }
     };
-  }, [isOpen]);
+  }, []);
 
   return (
     <>
@@ -39,7 +41,7 @@ function Aside() {
       
       {/* Sidebar */}
       <aside 
-        className={`fixed top-16 left-0 w-80 h-[calc(100vh-4rem)] text-white overflow-y-auto p-6 border-r border-[#3E4042] bg-[#14181a] 
+        className={`fixed top-16 left-0 w-80 h-[calc(100vh-4rem)] text-white overflow-y-auto no-scrollbar p-6 border-r border-[#3E4042] bg-[#14181a] 
           transform transition-transform duration-300 ease-in-out z-30
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >

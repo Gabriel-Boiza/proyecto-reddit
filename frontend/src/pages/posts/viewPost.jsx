@@ -8,46 +8,45 @@ import { domain } from "../../context/domain"
 import axios from "axios"
 import Comment from "../../components/posts/comment"
 
-function ViewPost(){
-    const {id} = useParams();
+function ViewPost() {
+    const { id } = useParams();
     const [post, setPost] = useState(null);
-    const [refreshComments, setRefreshComments] = useState(false); // <-- estado para refrescar comentarios
+    const [refreshComments, setRefreshComments] = useState(false);
 
     const postData = async () => {
         try {
-            const providedData = await axios.get(`${domain}getPostById/${id}`, {withCredentials: true});
+            const providedData = await axios.get(`${domain}getPostById/${id}`, { withCredentials: true });
             setPost(providedData.data);
         } catch (error) {
             console.log("ha petado");
-        }      
+        }
     };
 
     useEffect(() => {
         postData();
     }, []);
 
-    // función que se llamará desde el formulario para refrescar comentarios
     const triggerRefreshComments = () => {
-        setRefreshComments(prev => !prev); // alterna el valor
+        setRefreshComments(prev => !prev);
     };
 
     return (
-        <div className="min-h-screen bg-[#14181a]">
+        <div className="bg-[#14181a] min-h-screen">
             <Header />
-            <div className="pt-16"> {/* Add padding-top for fixed header */}
+            <div className="flex pt-16 max-w-6xl mx-auto">
                 <Aside />
-                <div className="flex">
-                    <main className="content w-full p-4 md:ml-80">
+                <main className="flex justify-center items-start w-full p-4">
+                    <div className="w-full max-w-2xl">
                         {post ? (
                             <>
                                 <Post post={post} />
                                 <Comment post_id={id} refresh={refreshComments} />
                             </>
                         ) : (
-                            <p>Cargando post...</p>
+                            <p className="text-white">Cargando post...</p>
                         )}
-                    </main>
-                </div>
+                    </div>
+                </main>
             </div>
         </div>
     );
