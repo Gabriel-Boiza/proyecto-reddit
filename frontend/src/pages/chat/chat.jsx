@@ -27,51 +27,8 @@ const ChatFullPage = () => {
             setMessages(prev => [...prev, newMessage]);
         });
         
-        // Modificación: mejorar el manejo de estados de mensajes
-        socket.on("message_delivered", (deliveredMessage) => {
-            setMessages(prev => {
-                return prev.map(m => {
-                    // Identificar mensaje por timestamp y contenido
-                    if (m.timestamp === deliveredMessage.timestamp && 
-                        m.content === deliveredMessage.content &&
-                        m.from === deliveredMessage.from) {
-                        return { ...m, status: "delivered" };
-                    }
-                    return m;
-                });
-            });
-        });
-        
-        socket.on("message_pending", (pendingMessage) => {
-            // No añadimos mensajes pendientes que ya existan en el estado
-            setMessages(prev => {
-                const exists = prev.some(m => 
-                    m.timestamp === pendingMessage.timestamp && 
-                    m.content === pendingMessage.content &&
-                    m.from === pendingMessage.from
-                );
-                
-                if (exists) {
-                    // Si existe, solo actualizamos su estado a "pending" si es necesario
-                    return prev.map(m => {
-                        if (m.timestamp === pendingMessage.timestamp && 
-                            m.content === pendingMessage.content &&
-                            m.from === pendingMessage.from) {
-                            return { ...m, status: "pending" };
-                        }
-                        return m;
-                    });
-                }
-                
-                // Si no existe, lo añadimos como nuevo mensaje pendiente
-                return [...prev, { ...pendingMessage, status: "pending" }];
-            });
-        });
-        
         return () => {
             socket.off("new_message");
-            socket.off("message_delivered");
-            socket.off("message_pending");
         };
     }, [user_id]);
     
@@ -99,32 +56,27 @@ const ChatFullPage = () => {
             {
                 content: "Hola, ¿cómo estás?",
                 from: user_id,
-                timestamp: new Date(Date.now() - 100000).toISOString(),
-                status: "delivered"
+                timestamp: new Date(Date.now() - 100000).toISOString()
             },
             {
                 content: "¡Muy bien! ¿Y tú?",
                 from: otherUser.id,
-                timestamp: new Date(Date.now() - 90000).toISOString(),
-                status: "delivered"
+                timestamp: new Date(Date.now() - 90000).toISOString()
             },
             {
                 content: "Todo bien, estaba revisando ese post que subiste ayer",
                 from: user_id,
-                timestamp: new Date(Date.now() - 80000).toISOString(),
-                status: "delivered"
+                timestamp: new Date(Date.now() - 80000).toISOString()
             },
             {
                 content: "¿Te pareció interesante?",
                 from: otherUser.id,
-                timestamp: new Date(Date.now() - 70000).toISOString(),
-                status: "delivered"
+                timestamp: new Date(Date.now() - 70000).toISOString()
             },
             {
                 content: "Sí, especialmente la parte sobre React hooks",
                 from: user_id,
-                timestamp: new Date(Date.now() - 60000).toISOString(),
-                status: "delivered"
+                timestamp: new Date(Date.now() - 60000).toISOString()
             }
         ];
         
@@ -161,14 +113,13 @@ const ChatFullPage = () => {
         const newMessage = {
             content: message,
             from: user_id,
-            timestamp: new Date().toISOString(),
-            status: "pending"
+            timestamp: new Date().toISOString()
         };
         
-        // Añadimos el mensaje a la UI primero
+        // Añadimos el mensaje a la UI
         setMessages(prev => [...prev, newMessage]);
         
-        // Luego lo enviamos por socket - mantenemos el formato original que espera el servidor
+        // Enviamos por socket
         socket.emit("message", message);
         
         setMessage("");
@@ -242,18 +193,8 @@ const ChatFullPage = () => {
                                         }`}>
                                             <p className="break-words">{msg.content}</p>
                                         </div>
-                                        <div className="text-xs text-gray-500 mt-1 flex items-center">
+                                        <div className="text-xs text-gray-500 mt-1">
                                             {formatMessageDate(msg.timestamp)}
-                                            {msg.from === user_id && (
-                                                <>
-                                                    {msg.status === "pending" && (
-                                                        <span className="ml-1 text-yellow-500">●</span>
-                                                    )}
-                                                    {msg.status === "delivered" && (
-                                                        <span className="ml-1 text-green-500">●</span>
-                                                    )}
-                                                </>
-                                            )}
                                         </div>
                                     </div>
                                 </div>

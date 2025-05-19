@@ -104,44 +104,12 @@ io.on('connection', socket => {
             
             // Enviar mensaje al destinatario
             io.to(receiverInfo.socketID).emit("new_message", messageObj);
-            
-            // Confirmar al remitente que se entregó el mensaje
-            socket.emit("message_delivered", messageObj);
         } else {
             // El destinatario no está conectado
-            console.log(`Usuario ${receiverUserId} no está conectado. Mensaje en espera.`);
+            console.log(`Usuario ${receiverUserId} no está conectado.`);
             
-            // Aquí se debe guardar el mensaje en la base de datos
-            // para entregarlo cuando el usuario se conecte
-            
-            /*
-            // Código para guardar en base de datos (a implementar)
-            try {
-                // Importar el modelo de mensajes
-                // const Message = require('./models/Message');
-                
-                // Crear nuevo mensaje
-                // const newMessage = new Message({
-                //     sender: senderUserId,
-                //     receiver: receiverUserId,
-                //     content: messageContent,
-                //     read: false,
-                //     timestamp: new Date()
-                // });
-                
-                // Guardar mensaje
-                // await newMessage.save();
-                
-                // Confirmar al remitente que se guardó el mensaje
-                // socket.emit("message_stored", messageObj);
-            } catch (error) {
-                console.error("Error al guardar mensaje:", error);
-                socket.emit("message_error", { error: "No se pudo guardar el mensaje" });
-            }
-            */
-            
-            // Mientras tanto, notificar al remitente que el mensaje está pendiente
-            socket.emit("message_pending", messageObj);
+            // Aquí se podría implementar la lógica para guardar en base de datos
+            // para futuras implementaciones
         }
     });
 
