@@ -12,29 +12,46 @@ import PrivateRoute from './components/privateRoute.jsx';
 import EditPost from './pages/posts/editPost.jsx';
 import ViewPost from './pages/posts/viewPost.jsx';
 import UserSearch from './pages/users/UserSearch.jsx';
+import PrivateAdminRoute from './components/privateAdminRoute.jsx';
+import AdminProvider from './context/adminProvides.jsx';
+import LoginAdmin from './pages/auth/LoginAdmin.jsx';
+import ViewPostsAdmin from './pages/admin/viewPosts.jsx';
+
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path='/post/:id' element={<ViewPost/>} />
-          <Route path="/profile/:username" element={<Profile  isOwner={false}/>} />
-          <Route path="/searchUsers" element={<UserSearch/>} />
-          
+    <AdminProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path='/post/:id' element={<ViewPost/>} />
+            <Route path="/profile/:username" element={<Profile  isOwner={false}/>} />
+            <Route path="/searchUsers" element={<UserSearch/>} />
+            
 
-          <Route element={<PrivateRoute />}>
-            <Route path='/editPost/:id' element={<EditPost/>}></Route>
-            <Route path="/chat/:username" element={<Chat/>}/>
-            <Route path="/createPost" element={<CreatePost />} />
-            <Route path="/profile" element={<Profile isOwner={true}/>} />
-            <Route path="/editProfile" element={<EditProfile />} />
-          </Route>
-        </Routes>
-      </Router>
-    </AuthProvider>
+            <Route element={<PrivateRoute />}>
+              <Route path='/editPost/:id' element={<EditPost/>}></Route>
+              <Route path="/chat/:username" element={<Chat/>}/>
+              <Route path="/createPost" element={<CreatePost />} />
+              <Route path="/profile" element={<Profile isOwner={true}/>} />
+              <Route path="/editProfile" element={<EditProfile />} />
+            </Route>
+            
+            <Route path="/admin/login" element={<LoginAdmin />} />
+            
+            <Route element={<PrivateAdminRoute />}>
+              <Route path="/admin/dashboard" element={<h1>Dashboard</h1>}/>
+              <Route path="/admin/users" element={<h1>Users</h1>}/>
+              <Route path="/admin/posts" element={<ViewPostsAdmin/>}/>
+              <Route path="/admin/comments" element={<h1>Comments</h1>}/>
+            </Route>
+
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </AdminProvider>
   );
 }
 

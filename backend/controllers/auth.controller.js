@@ -5,6 +5,8 @@ import { dirname } from 'path';
 import User from '../models/User.js';
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken"
+import Admin from '../models/Admin.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -72,3 +74,45 @@ export const logout = async (req, res) => {
         res.status(500).json({message : error.message})
     }
 }
+
+
+export const adminLogin = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const admin = await Admin.findOne({ username });
+    if (!admin) throw new Error('Admin not found');
+
+    const isValid = admin.password == password;
+    if (!isValid) throw new Error('Password incorrect');
+
+    const token = jwt.sign(
+      { id: admin._id, username: admin.username, role: 'admin' },
+      process.env.SECRET_JWT_KEY,
+      { expiresIn: '3h' }
+    );
+
+    res.cookie('admin_token', token, {
+      httpOnly: true,
+      secure: true, // true en producción con HTTPS
+      sameSite: 'None'
+    }).json({ message: 'Admin login successful' });
+
+  } catch (error) {
+    res.status(401).json({ message: error.message });
+  }
+};
+
+export const adminLogout = async (req, res) => {
+  try {
+    res.clearCookie('admin_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None'
+    }).json({ message: 'Admin logout successful' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+

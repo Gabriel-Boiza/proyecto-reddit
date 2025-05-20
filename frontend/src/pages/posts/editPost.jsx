@@ -41,11 +41,12 @@ function EditPost() {
     fetchPost();
   }, [id]);
 
-  useEffect(() => {
-    if (activeTab === 'text' && descriptionRef.current) {
-      descriptionRef.current.innerHTML = description;
-    }
-  }, [activeTab, description]);
+    useEffect(() => {
+      if (activeTab === 'text' && descriptionRef.current) {
+        descriptionRef.current.innerHTML = description;
+      }
+    }, [activeTab]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -134,7 +135,7 @@ function EditPost() {
             <div
               ref={descriptionRef}
               contentEditable
-              onInput={(e) => setDescription(e.target.innerHTML)}
+              onInput={(e) => setDescription(e.target.innerText)}
               className="w-full h-40 p-2 border rounded overflow-y-auto"
               suppressContentEditableWarning
             ></div>
