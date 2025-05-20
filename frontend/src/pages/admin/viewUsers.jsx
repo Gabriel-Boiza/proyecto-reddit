@@ -106,23 +106,23 @@ function ViewUsersAdmin() {
   return (
     <div className="min-h-screen bg-neutral-900">
       <AdminAside />
-      <div className="pl-64">
-        <div className="p-6">
+      <div className="lg:pl-64">
+        <div className="p-4 sm:p-6">
           <div className="max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent pl-12 lg:pl-0">
                 Users Dashboard
               </h1>
               <button
                 onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition duration-200 shadow-lg hover:shadow-red-500/20"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2 rounded-lg transition duration-200 shadow-lg hover:shadow-red-500/20"
               >
                 Logout
               </button>
             </div>
 
             <div className="mb-8 space-y-4">
-              <div className="flex flex-col md:flex-row gap-4 items-stretch">
+              <div className="flex flex-col sm:flex-row gap-4 items-stretch">
                 <div className="relative flex-grow">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Search size={20} className="text-gray-400" />
