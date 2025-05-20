@@ -3,6 +3,31 @@ import User from "../models/User.js";
 import Post from "../models/Post.js";
 import mongoose from "mongoose";
 
+export const getAllComments = async (req, res) => {
+  try {
+    const comments = await Comment.find()
+      .populate({
+        path: "user",
+        select: "username profileImage"
+      })
+      .populate({
+        path: "post",
+        select: "title"
+      })
+      .sort({ created_at: -1 });
+
+    res.status(200).json({
+      comments
+    });
+  } catch (error) {
+    console.error("Error fetching all comments:", error);
+    res.status(500).json({
+      message: "Error fetching comments",
+      error: error.message
+    });
+  }
+};
+
 export const createComment = async (req, res) => {
   try {
     const { text, post_id, parent_id } = req.body;
@@ -187,14 +212,13 @@ export const deleteComment = async (req, res) => {
       });
     }
 
-    // Only allow the comment creator to delete it
     if (comment.user.toString() !== user_id) {
       return res.status(403).json({
         message: "You are not authorized to delete this comment"
       });
     }
 
-    // If this comment has a parent, remove this comment from parent's children array
+
     if (comment.parent) {
       await Comment.findByIdAndUpdate(
         comment.parent,
@@ -202,13 +226,10 @@ export const deleteComment = async (req, res) => {
       );
     }
 
-    // Handle any children of this comment
-    // Option 1: Delete all child comments (cascade delete)
     if (comment.children && comment.children.length > 0) {
       await Comment.deleteMany({ _id: { $in: comment.children } });
     }
     
-    // Finally delete the comment itself
     await Comment.findByIdAndDelete(id);
 
     res.status(200).json({
@@ -222,6 +243,46 @@ export const deleteComment = async (req, res) => {
     });
   }
 };
+
+export const deleteCommentAsAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const comment = await Comment.findById(id);
+    if (!comment) {
+      return res.status(404).json({
+        message: "Comment not found"
+      });
+    }
+
+    // Si tiene padre, eliminar referencia del padre
+    if (comment.parent) {
+      await Comment.findByIdAndUpdate(
+        comment.parent,
+        { $pull: { children: comment._id } }
+      );
+    }
+
+    // Si tiene hijos, eliminarlos también
+    if (comment.children && comment.children.length > 0) {
+      await Comment.deleteMany({ _id: { $in: comment.children } });
+    }
+
+    // Finalmente, eliminar el comentario
+    await Comment.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message: "Comment deleted successfully (as admin)"
+    });
+  } catch (error) {
+    console.error("Error deleting comment as admin:", error);
+    res.status(500).json({
+      message: "Error deleting comment",
+      error: error.message
+    });
+  }
+};
+
 
 export const likeComment = async (req, res) => {
   try {

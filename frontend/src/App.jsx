@@ -16,7 +16,8 @@ import PrivateAdminRoute from './components/privateAdminRoute.jsx';
 import AdminProvider from './context/adminProvides.jsx';
 import LoginAdmin from './pages/auth/LoginAdmin.jsx';
 import ViewPostsAdmin from './pages/admin/viewPosts.jsx';
-
+import ViewCommentsAdmin from './pages/admin/viewComments.jsx';
+import ViewUsersAdmin from './pages/admin/viewUsers.jsx';
 function App() {
   return (
     <AdminProvider>
@@ -43,9 +44,9 @@ function App() {
             
             <Route element={<PrivateAdminRoute />}>
               <Route path="/admin/dashboard" element={<h1>Dashboard</h1>}/>
-              <Route path="/admin/users" element={<h1>Users</h1>}/>
+              <Route path="/admin/users" element={<ViewUsersAdmin/>}/>
               <Route path="/admin/posts" element={<ViewPostsAdmin/>}/>
-              <Route path="/admin/comments" element={<h1>Comments</h1>}/>
+              <Route path="/admin/comments" element={<ViewCommentsAdmin/>}/>
             </Route>
 
           </Routes>
