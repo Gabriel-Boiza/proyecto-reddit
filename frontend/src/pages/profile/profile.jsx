@@ -46,24 +46,24 @@ function Profile({isOwner}) {
     const [isFollowing, setIsFollowing] = useState(false);
 
     useEffect(() => {
-        const fetchAll = async () => {
-            try {
-                const dataPromises = [
-                    userData(),
-                    userPosts(),
-                    fetchUserInteractions(),
-                    checkFollowStatus(),
-                    fetchFollowers(),
-                    fetchFollowing()
-                ];
-                await Promise.all(dataPromises);
-            } catch (error) {
-                console.error("Error loading profile data:", error);
-            }
+        if (!isAuth && !username) {
+            navigate("/login");
+            return;
+        }
+        
+        const loadProfileData = async () => {
+            await Promise.all([
+                userData(),
+                userPosts(),
+                fetchUserInteractions(),
+                fetchFollowers(),
+                fetchFollowing(),
+                checkFollowStatus()
+            ]);
         };
-    
-        fetchAll();
-    }, [isAuth]); //cuando carga la variable vuelve a checkear el status
+
+        loadProfileData();
+    }, [isAuth, username]); // Agregamos username como dependencia
     
     const fetchUserInteractions = async () => {
         try {
