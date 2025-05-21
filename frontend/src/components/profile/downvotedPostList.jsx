@@ -16,11 +16,15 @@ const DownvotedPostList = ({ downvotedPosts }) => {
                                                             >
                                                             <div className="relative rounded-md p-4 hover:bg-gray-800 ">
 
+                                                                {post?.file_url && (
                                                                 <img
-                                                                src={`${domain}uploads/${post.file_url}` || "https://via.placeholder.com/150"}
+                                                                src={
+                                                                    `${domain}uploads/${post.file_url}`
+                                                                }
                                                                 alt={post.title}
                                                                 className="w-18 h-18 rounded-md mb-2 float-left mr-2"
                                                                 />
+                                                                )}
                                                                 <h3 className="text-xl text-[#B7CAD4] font-semibold">{post.title}</h3>
                                                                 <p className="text-gray-400">{post.description}</p>
                                                             </div>
